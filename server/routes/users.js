@@ -4,7 +4,7 @@ var fs = require('fs');
 
 var Web3 = require('web3');
 
-var provider = new Web3.providers.HttpProvider("http://127.0.0.1:8545");
+var provider = new Web3.providers.HttpProvider("http://127.0.0.1:7545");
 var contract = require("truffle-contract");
 
 /* GET users listing. */
@@ -14,9 +14,10 @@ router.get('/', function(req, res, next) {
       throw err;
     var helloWorldAbi = JSON.parse(data);
     var helloWorldContract = contract({
-      abi:helloWorldAbi,
-      address:'0x192Aa6873a4B8DAf59Fd0aDe090878d250d1dAeD'
+      abi:helloWorldAbi.abi,
+      address:'0xc132c1e1a347883c5170a332eb2e61a024f354a8'
     });
+    console.log(helloWorldAbi);
 
     helloWorldContract.setProvider(provider);
     if (typeof helloWorldContract.currentProvider.sendAsync !== "function") {
@@ -26,11 +27,15 @@ router.get('/', function(req, res, next) {
         );
       };
     }
+    console.log(helloWorldContract);
+    helloWorldContract.setNetwork("*");
 
-    console.log(helloWorldContract.currentProvider);
+    console.log(helloWorldContract.networks);
 
-    helloWorldContract.deployed().then(function(hi){
-      res.send(hi.sayHello.call())
+
+    helloWorldContract.deployed().then(function(i){
+      var hi = i.sayhello;
+      res.send("hi,2018"+hi);
     }).catch(console.error);
 
   });

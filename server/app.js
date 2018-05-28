@@ -7,7 +7,9 @@ var app = express();
 
 // 注册users接口
 var users = require('./routes/users');
+var helloWorld = require('./routes/helloWorld');
 app.use('/users', users);
+app.use('/helloWorld', helloWorld);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
