@@ -6,12 +6,13 @@ var ResourceCopyrightSchema = new mongoose.Schema({
   resourceAddress:String,
   resourceHash:String,
   resourceDHash:String,
-  author:[{
+  account:String,
+  author:[new mongoose.Schema({
     _id: false,
     authorName:String,
     identityType:Number,
     identityNum:String
-  }],
+  })],
   workProperty:String,
   rights:[String],
   belong:String,

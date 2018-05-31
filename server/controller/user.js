@@ -1,6 +1,6 @@
 var userDao = require("../dao/user");
 var log4js = require('log4js');
-var logger = log4js.getLogger('chainbook');
+var logger = log4js.getLogger('controller/user');
 
 /**
  * 使用passport来控制权限,和存储session，密码加密存储
@@ -49,9 +49,12 @@ exports.getCurrentUserInfo = function (req, res, next) {
  * @param res
  * @param next
  */
-exports.getPurchasedResourcesByUser = function(req, res, next) {
+exports.getPurchasedResourcesByUser = async function(req, res, next) {
   logger.info('get purchased resources');
-  res.send("get purchased resources");
+  //1、先拿到当前用户信息，判断用户是否是登录状态
+  //2、从数据库中获取当前已购买的资源列表
+  const list = await userDao.getPurchasedResourcesByUserId("5b0e778305373eafe9ceed5f");
+  res.send(list);
 }
 
 /**
