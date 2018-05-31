@@ -1,31 +1,83 @@
+var createError = require('http-errors');
 var express = require('express');
-var fs = require('fs');
 var path = require('path');
-var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var log4js = require('log4js');
+var mainRouter = require('./route');
+var config = require('./config');
+var mongoose = require("mongoose");
+
+//日志配置 TODO 优化和文件绑定
+log4js.configure({
+  appenders: {
+    out: { type: 'console' },
+    chainbook: { type: 'dateFile', filename: 'chainbook.log', alwaysIncludePattern:true },
+  },
+  categories: {
+    default: { appenders: ['out','chainbook'], level: 'INFO'}
+  }
+});
+
+var logger = log4js.getLogger();
 
 var app = express();
-
-// 注册users接口
-var users = require('./routes/users');
-var helloWorld = require('./routes/helloWorld');
-app.use('/users', users);
-app.use('/helloWorld', helloWorld);
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false
-}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // 访问静态资源
-app.use(express.static(path.resolve(__dirname, '../dist')));
+app.use(express.static(path.join(__dirname, '../dist')));
 
-// 访问单页
-app.get('*', function (req, res) {
-  var html = fs.readFileSync(path.resolve(__dirname, '../dist/index.html'), 'utf-8');
-  res.send(html);
+// 路由的配置需要放置在前面,且使用根目录路由
+app.use('/', mainRouter);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
 });
 
-// 监听
-app.listen(8081, function () {
-  console.log('success listen...8081');
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  logger.error(err);
+
+  // render the error page
+  res.status(err.status || 500);
+  res.send(err);
 });
+
+
+//mongoose config
+var dbOption = {
+  db: {
+    native_parser: true
+  },
+  server: {poolSize: config.db.poolSize},
+  user: config.db.userName,
+  pass: config.db.password
+}
+
+mongoose.connect(config.db.uri, dbOption);
+
+mongoose.connection.on('connected', function () {
+  logger.info("DB connected", "success to connect DB", {"url:": config.db.uri});
+});
+
+mongoose.connection.on('error', function (err) {
+  logger.error("DB connected error", 'DB connected failed', {"url": config.db.uri, "err:": err});
+});
+
+mongoose.connection.on('disconnected', function () {
+  logger.info('DB disconnected', "success to close DB connection", {"url": config.db.uri});
+});
+process.on('SIGINT', function () {
+  mongoose.connection.close(function () {
+    logger.info('DB disconnected', "disconnected while app stopped", {"url": config.db.uri});
+    process.exit(0);
+  });
+});
+
+module.exports = app;
+

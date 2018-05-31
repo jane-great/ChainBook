@@ -1,0 +1,9 @@
+{
+  "db": {
+    "uri": "mongodb://127.0.0.1:27017/chainbook",
+    "poolSize": 10,
+    "readPreference": "secondaryPreferred",
+    "userName": "",
+    "password": ""
+  }
+}

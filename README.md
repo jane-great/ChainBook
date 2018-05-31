@@ -1,7 +1,3 @@
-# y
-
-> y
-
 ## Build Setup
 
 ``` bash
@@ -23,5 +19,14 @@ npm run unit
 # run all tests
 npm test
 ```
+# mongodb install
+从mongodb官网现在并安装mongodb
+https://www.mongodb.com/download-center?jmp=tutorials&_ga=2.99390234.503106171.1527646565-1887027323.1527385485#atlas
+启动mongodb
+https://docs.mongodb.com/tutorials/install-mongodb-on-windows/
+导入db文件夹中的db初始化文件
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+
+
+

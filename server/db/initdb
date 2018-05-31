@@ -1,0 +1,65 @@
+---------user-----------------------
+db.user.insertOne({
+  "userName":"admin",
+  "pwd":"admin",
+  "account":"0x7cF2baAe306B1B0476843De3909097be0E6850f3",
+  "mobile":"1234567890",
+  "email":"test@163.com",
+  "copyright":[{
+    "workName":"链书设计大全",
+    "resourcesIpfsHash":"0x7cF2baAe306B1B0476843De3909097be0E6850f3",
+    "resourcesIpfsDHash":"0x7cF2baAe306B1B0476843De3909097be0E6850f3",
+    "localUrl":"http://localhost:3000/ChainBook/login?userName=admin&pwd=admin",
+    "copyrightAddress":"版权合约的地址",
+    "resourcesAddress":"版权合约的地址"
+  }],
+  "purchasedResources":[{
+    "resourceName":"以太坊白皮书",
+    "type":"book",
+    "tokenId":"book_contracts_token_id",
+    "sellStatus":0,
+    "sellPrice":"20.00",
+    "rentOutStatus":0,
+    "rentPrice":"2.00"
+  }],
+  "rentResources":[{
+    "resourceName":"以太猫黄皮书",
+    "type":"book",
+    "tokenId":"book_contracts_token_id",
+    "rentTime":30
+  }]
+}
+);
+---------resourceInfo---------------
+db.resourceInfo.insertOne({
+  "resourceName":"以太坊白皮书",
+  "desc":"介绍以太坊的架构基础，及其特性",
+  "limit":10000,
+  "coverImage":"url",
+  "price":"10.00",
+  "copyrightAddress":"版权合约的地址",
+  "resourceAddress":"资源合约的地址",
+  "authorAccount":"作者的地址",
+  "hasSellOut":0
+}
+);
+---------resourceCopyright----------
+db.resourceCopyright.insertOne({
+  "workName":"以太坊白皮书",
+  "workCategory":"word",
+  "copyrightAddress":"版权合约的地址",
+  "resourceAddress":"资源合约的地址",
+  "resourceHash":"",
+  "resourceDHash":"",
+  "author":[{
+    "authorName":"eth",
+    "identityType":"身份证",
+    "identityNum":"430080989080809801x"
+  }],
+  "workProperty":"原创",
+  "rights":["发表权","修改权","出租权"],
+  "belong":"合作作品",
+  "auditStatus":1,
+  "publishStatus":1
+}
+);
