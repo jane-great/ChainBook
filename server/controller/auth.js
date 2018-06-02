@@ -6,8 +6,7 @@ module.exports = {
     if(req.isAuthenticated()) {
       return next();
     }else{
-      //req.flash(config.constant.flash.error, '请先登录!');
-      res.redirect('ChainBook/login')
+      res.redirect('/ChainBook/login');
     }
   }
 };

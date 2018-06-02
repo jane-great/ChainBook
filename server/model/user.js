@@ -5,8 +5,10 @@ var userSchema = new mongoose.Schema({
   account:String,
   email: String,
   mobile: String,
+  randomNum: String,
   copyright:[new mongoose.Schema({
     _id: false,
+    copyrightId:String,
     workName: String,
     resourcesIpfsHash:String,
     resourcesIpfsDHash:String,
@@ -16,6 +18,7 @@ var userSchema = new mongoose.Schema({
   })],
   purchasedResources:[new mongoose.Schema({
     _id: false,
+    resourceId:String,
     resourceName: String,
     type:String,
     tokenId:String,
@@ -26,6 +29,7 @@ var userSchema = new mongoose.Schema({
   })],
   rentResources:[new mongoose.Schema({
     _id: false,
+    resourceId:String,
     resourceName:String,
     type:String,
     tokenId:String,

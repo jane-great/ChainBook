@@ -9,43 +9,16 @@ var config = require('./config');
 var mongoose = require("mongoose");
 var passport = require('passport');
 var LocalStrategy = require("passport-local").Strategy;
+
+//持久化session
+var session = require("express-session");
+var MongoStore = require('connect-mongo')(session);
+var flash = require('connect-flash');
+
 var userDao = require("./dao/user");
 const resolve = file=>path.resolve(__dirname, file);
 
-passport.use(new LocalStrategy({
-  usernameField: 'userName',
-  passwordField: 'pwd'
-},function(userName,password,done) {
-  //校验用户名密码是否正确
-  userDao.verifyUser(userName,password,function(err,data) {
-    if(err){
-      logger.error("passport verify fail.",{
-        userName: userName,
-        password: password
-      },err);
-      done(err);
-    } else {
-      logger.info("passport verify success:",{
-        userName: userName,
-        password: password
-      });
-      //TODO 需要将session序列化存储在服务器录，记录用户的登录状态
-      done(null,data);
-    }
-  });
-}));
-
-passport.serializeUser(function (user,done){
-  done(null,user._id);
-});
-
-passport.deserializeUser(function (id, done) {
-  userDao.findById(id,function(err,user){
-    done(null, user);
-  });
-});
-
-//日志配置
+//日志配置,TODO 挪开
 log4js.configure({
   appenders: {
     out: { type: 'console' },
@@ -62,6 +35,49 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(session({
+  secret: 'chainbook',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false },
+  store: new MongoStore({ mongooseConnection: mongoose.connection }) //session存储位置
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
+passport.use(new LocalStrategy({
+  usernameField: 'userName',
+  passwordField: 'pwd'
+},function(userName,password,done) {
+  //校验用户名密码是否正确
+  userDao.verifyUser(userName,password).then(function(result){
+    logger.info("passport verify success:",{
+      userName: userName,
+      password: password
+    });
+    done(null,result);
+  }).catch(err =>{
+    logger.error("passport verify fail.",{
+      userName: userName,
+      password: password
+    },err);
+    done(err);
+  });
+}));
+
+passport.serializeUser(function (user,done){
+  done(null,user);
+});
+
+passport.deserializeUser(function (id, done) {
+  userDao.findUserInfoById(id).then(user => {
+    done(null, user);
+  }).catch( err =>{
+    logger.error("passport deserialize user fail",err);
+    done(null, false);
+  });
+});
 
 // 访问静态资源
 app.use(express.static(path.join(__dirname, '../dist')));

@@ -49,6 +49,6 @@ exports.registerCopyright = function(resourceCopyright){
  */
 exports.getResourceCopyrightDetailById = function(req, res, next) {
   logger.info("getResourceCopyrightDetailById");
-  //1、先登记发布的资源基本数据
+  //
   res.send("getResourceCopyrightDetailById");
 }

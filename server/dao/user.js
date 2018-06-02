@@ -5,6 +5,7 @@ var crypto = require('crypto');
 var ObjectUtil = require("../utils/objectUtils");
 var log4js = require('log4js');
 var logger = log4js.getLogger('dao/user');
+var encrypt = require('../utils/encrypt');
 
 
 var UserDao = function () {
@@ -14,17 +15,47 @@ var UserDao = function () {
 
 util.inherits(UserDao, SuperDao);
 
-UserDao.prototype.verifyUser = function (userName, password, callback) {
-  User.findOne({
-    userName: userName,
-    pwd: password
-  }, function (err, obj) {
-    callback(err, obj);
+UserDao.prototype.verifyUser = function (userName, password) {
+  return new Promise((resolve, reject) => {
+    User.findOne({userName: userName},{
+      userName:1,
+      pwd:1,
+      email:1,
+      mobile:1,
+      randomNum:1
+    },function (err, obj) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      if(encrypt.getMD5(password, obj.randomNum) == obj.pwd){
+        obj.randomNum = '';
+        resolve(obj);
+      }else{
+        reject(new Error('userName or pwd invalid'));
+      }
+    });
+  });
+}
+
+UserDao.prototype.findUserInfoById = function(id){
+  return new Promise((resolve, reject) => {
+    User.findOne({_id: id},{
+      userName:1,
+      email:1,
+      mobile:1,
+    },function (err, obj) {
+      if (err) {
+        reject(err);
+      }else {
+        resolve(obj);
+      }
+    });
   });
 }
 
 
-UserDao.prototype.update = function (userObj, callback) {
+UserDao.prototype.updatePwd = function (userObj, callback) {
   var id = userObj._id;
   if (userObj.password) {
     userObj['randomNum'] = getRandom();
@@ -256,20 +287,6 @@ UserDao.prototype.modifyRentStatus = function(id,tokenId,rentStatus){
       reject(err);
     });
   }
-}
-
-
-
-//获取md5加密
-function getMD5(password, randomNum) {
-  var md5 = crypto.createHash('md5');
-  md5.update(password + randomNum);
-  return md5.digest('hex');
-}
-
-/*产生一个随机数*/
-function getRandom() {
-  return Math.random().toString(36).substring(7);
 }
 
 module.exports = new UserDao();

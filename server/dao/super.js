@@ -5,14 +5,22 @@ var SuperDao = function (model) {
 };
 
 //add
-SuperDao.prototype.add = function (modelObj, callback) {
+SuperDao.prototype.add = function (modelObj) {
   if (modelObj) {
-    var instance = new this.model(modelObj);
-    instance.save(function (err, savedObj) {
-      return callback(err, savedObj);
+    return new Promise((resolve, reject) => {
+      var instance = new this.model(modelObj);
+      instance.save(function (err, savedObj) {
+        if(err){
+          reject(err);
+        }else{
+          resolve(savedObj);
+        }
+      });
     });
   } else {
-    return callback(new Error("modelObj is not null."));
+    return new Promise(reject => {
+      reject(new Error("modelObj is not null."));
+    });
   }
 }
 
