@@ -1,13 +1,51 @@
 var createError = require('http-errors');
 var express = require('express');
+var fs = require('fs');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var log4js = require('log4js');
 var mainRouter = require('./route');
 var config = require('./config');
 var mongoose = require("mongoose");
+var passport = require('passport');
+var LocalStrategy = require("passport-local").Strategy;
+var userDao = require("./dao/user");
+const resolve = file=>path.resolve(__dirname, file);
 
-//日志配置 TODO 优化和文件绑定
+passport.use(new LocalStrategy({
+  usernameField: 'userName',
+  passwordField: 'pwd'
+},function(userName,password,done) {
+  //校验用户名密码是否正确
+  userDao.verifyUser(userName,password,function(err,data) {
+    if(err){
+      logger.error("passport verify fail.",{
+        userName: userName,
+        password: password
+      },err);
+      done(err);
+    } else {
+      logger.info("passport verify success:",{
+        userName: userName,
+        password: password
+      });
+      //TODO 需要将session序列化存储在服务器录，记录用户的登录状态
+      done(null,data);
+    }
+  });
+}));
+
+passport.serializeUser(function (user,done){
+  done(null,user._id);
+});
+
+passport.deserializeUser(function (id, done) {
+  userDao.findById(id,function(err,user){
+    done(null, user);
+  });
+});
+
+//日志配置
 log4js.configure({
   appenders: {
     out: { type: 'console' },
@@ -30,6 +68,15 @@ app.use(express.static(path.join(__dirname, '../dist')));
 
 // 路由的配置需要放置在前面,且使用根目录路由
 app.use('/', mainRouter);
+
+app.get('*', function (req, res, next) {
+  if(req.originalUrl.indexOf('/user')!=0 || req.originalUrl.indexOf('/copyright')!=0 || req.originalUrl.indexOf('/resource')!=0) {
+    const html = fs.readFileSync(resolve('../dist/index.html'), 'utf-8');
+    res.send(html);
+  }else{
+    next();
+  }
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -72,6 +119,7 @@ mongoose.connection.on('error', function (err) {
 mongoose.connection.on('disconnected', function () {
   logger.info('DB disconnected', "success to close DB connection", {"url": config.db.uri});
 });
+
 process.on('SIGINT', function () {
   mongoose.connection.close(function () {
     logger.info('DB disconnected', "disconnected while app stopped", {"url": config.db.uri});

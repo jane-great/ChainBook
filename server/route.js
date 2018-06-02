@@ -5,6 +5,8 @@ var resourceCopyright = require('./controller/resourceCopyright');
 var resourceInfo = require('./controller/resourceInfo');
 var helloWorld = require('./controller/helloWorld');
 var config = require('./config');
+var passport = require("passport");
+var auth = require("./controller/auth");
 
 var URL = "/" + config.appName;
 
@@ -15,12 +17,16 @@ router.use(function timeLog(req, res, next) {
 });
 
 //和合约交互的例子
-router.get(URL+'/helloWorld', helloWorld.sayHello);
+router.get(URL+'/helloWorld',auth.isAuthenticated,helloWorld.sayHello);
 
 
 //用户登录、注册、及获取当前用户
-router.post(URL+"/register", user.register);
-router.post(URL+"/login", user.login);
+router.post(URL+"/user/register", user.register);
+router.post(URL+"/user/localLogin",passport.authenticate('local',{
+  session:true,
+  successRedirect: URL+"/home",
+  failureRedirect: URL+"/home"
+}));
 router.get(URL+"/user/renderUser", user.getCurrentUserInfo);
 
 //用户个人管理

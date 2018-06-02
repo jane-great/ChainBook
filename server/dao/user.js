@@ -210,7 +210,7 @@ UserDao.prototype.modifySellStatus = function(id,tokenId,sellStatus){
     
     return new Promise((resolve,reject) => {
       User.update({'_id':id,'purchasedResources.tokenId':tokenId},
-        {$set:{ 'purchasedResources.sellStatus': sellStatus }},function(err,updateObj){
+        {$set:{ 'purchasedResources.$.sellStatus': sellStatus }},function(err,updateObj){
           if(err){
             reject(err);
           }else{
@@ -241,7 +241,7 @@ UserDao.prototype.modifyRentStatus = function(id,tokenId,rentStatus){
   
     return new Promise((resolve,reject) => {
       User.update({'_id':id,'purchasedResources.tokenId':tokenId},
-        {$set:{ 'purchasedResources.rentStatus': rentStatus }},function(err,updateObj){
+        {$set:{ 'purchasedResources.$.rentStatus': rentStatus }},function(err,updateObj){
           if(err){
             reject(err);
           }else{

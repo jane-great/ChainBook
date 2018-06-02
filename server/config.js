@@ -30,4 +30,10 @@ var log = {
 }
 config.log = log;
 
+//TODO 从外部配置文件读取
+var contract = {
+  url:"http://localhost:7545"
+}
+config.contract = contract;
+
 module.exports = config;
