@@ -1,114 +1,75 @@
 pragma solidity ^0.4.24;
 
-import "./ERC721.sol";
-import "./BookBase.sol";
+import "./BookTransaction.sol";
+import "./BookCopyrightCreate.sol";
 
-contract BookOwnerShip is BookBase, ERC721 {
 
-    bytes4 constant InterfaceSignature_ERC165 =  
-        bytes4(keccak256('supportsInterface(bytes4)'));
+contract BookOwnerShip is BookTransaction {    // 
 
-    bytes4 constant InterfaceSignature_ERC721 =  
-        bytes4(keccak256('name()')) ^  
-        bytes4(keccak256('symbol()')) ^  
-        bytes4(keccak256('totalSupply()')) ^  
-        bytes4(keccak256('balanceOf(address)')) ^  
-        bytes4(keccak256('ownerOf(uint256)')) ^  
-        bytes4(keccak256('approve(address,uint256)')) ^  
-        bytes4(keccak256('transfer(address,uint256)')) ^  
-        bytes4(keccak256('transferFrom(address,address,uint256)')) ^  
-        bytes4(keccak256('tokensOfOwner(address)')) ^  
-        bytes4(keccak256('tokenMetadata(uint256,string)')); 
-
-    function supportsInterface(bytes4 _interfaceID) external view returns (bool)  
-    {   
-  
-        return ((_interfaceID == InterfaceSignature_ERC165) || (_interfaceID == InterfaceSignature_ERC721));  
-    } 
-
-    // function getCopyright() external view returns(string, string, string, address, uint256) {
-    //   return copyright.getCopyright();
-    // }
-    
-    function _owns(address _claimant, uint256 _tokenId) internal view returns(bool) {
-        return bookIndexToOwner[_tokenId] == _claimant;
-    }
-
-    function _approvedFor(address _claimant, uint256 _tokenId) internal view returns(bool) {
-        return bookIndexToApproved[_tokenId] == _claimant;
-    }
-
-    function _approve(uint256 _tokenId, address _approved) internal {
-        bookIndexToApproved[_tokenId] = _approved;
-    }
-
-    function balanceOf(address _owner) public view returns(uint256) {
-        return ownershipTokenCount[_owner];
-    }
-
-    function name() public view returns (string) {
-        return bookName;
-    }
-
-    function symbol() public view returns (string) {
-        return author;
-    }
-
-    function transfer(
-        address _to,
-        uint256 _tokenId
-    )
-    external
-    whenNotPaused 
-    {
-        require(_to != address(0));  
-        require(_to != address(this));  
-        require(_to != address(buyAndSell));  
-        require(_to != address(rentAndLease)); 
-        require(_owns(msg.sender, _tokenId));  
-        _transfer(msg.sender, _to, _tokenId); 
-    }
-
-    function approve(  // 允许第三方调用transfer
-        address _to,  
-        uint256 _tokenId  
-    )  
-        external  
-        whenNotPaused  
-    {  
-        require(_owns(msg.sender, _tokenId));    
-        _approve(_tokenId, _to);   
-        Approval(msg.sender, _to, _tokenId);  
-    } 
-
-    function transferFrom(  // 第三方调用transfer
-        address _from,  
-        address _to,  
-        uint256 _tokenId  
-    )  
-        external  
-        whenNotPaused  
-    {  
-        require(_to != address(0));  
-        require(_to != address(this));  
-        require(_approvedFor(msg.sender, _tokenId));  
-        require(_owns(_from, _tokenId));  
-   
-        _transfer(_from, _to, _tokenId);  
+    constructor(address _copyright, uint256 _price, uint256 _totalAmount, uint256 _limitAmount) public {    //发布图书
+        copyrightAddress = _copyright;
+        BookCopyrightCreate bookCopyright = BookCopyrightCreate(_copyright);        
+         (bookName, author, authorAddress, ipfsHash, timestamp) = bookCopyright.getCopyright(); 
+        price = _price;
+        require(_totalAmount == uint32(_totalAmount));
+        require(_limitAmount == uint32(_totalAmount));
+        totalAmount = uint32(_totalAmount);
+        limitAmount = _limitAmount;
+        _creatBook(authorAddress);
     }  
 
-    function totalSupply() public view returns(uint256) {   //总发行量
-        return totalAmount;
+    // 获取书籍版权信息  （ 书名， 作者， 总发行量， ipfsHash, 版权合约地址， 发行时间 )
+    function getCopyrightInfo()  
+        external 
+        view 
+        returns (
+            string ,
+            string ,
+            uint256 ,
+            string ,
+            address ,
+            uint256 
+        )
+    {
+        return (bookName, author, totalAmount, ipfsHash, copyrightAddress, timestamp);
     }
 
-    function publishedAmount() public view returns(uint256) {   //已经发行数量
-        return books.length;
+    // 获取某本书的信息， （交易次数， 租赁次数， 购买时间， 书籍作者， 是否正在出售， 是否等待租赁 )
+    function getBookInfo(uint256 _tokenId)     
+        external 
+        view 
+        returns(
+            uint256,
+            uint256,
+            uint256,
+            address
+            // bool,
+            // bool
+        )
+    {
+        return(
+            books[_tokenId].transactions, 
+            books[_tokenId].rents, 
+            books[_tokenId].creatTime, 
+            bookIndexToOwner[_tokenId]
+            // bookInSell(_tokenId), 
+            // bookInRent(_tokenId)
+        );
     }
 
-    function ownerOf(uint256 _tokenId) external view returns(address owner){    //图书作者
-        owner = bookIndexToOwner[_tokenId];
+    function allowToRead(address _owner, uint256 _tokenId) external view returns(bool) {  // 是否允许阅读
+        return( (_owns(_owner, _tokenId) && rentAllowedToAddress[_tokenId] == address(0)) || rentAllowedToAddress[_tokenId] == _owner );  
+    }
+
+    function ownerOf(uint256 _tokenId) external view returns(address) {    //图书
+        address owner = bookIndexToOwner[_tokenId];
         require(owner != address(0));
+        return owner;
     } 
+
+    function getApproved(uint256 _tokenId) external view returns (address) {
+        return bookIndexToApproved[_tokenId];
+    }
 
     function tokenofOwner(address _owner) external view returns(uint256[] ownerTokens){ // 读者拥有的图书
         uint256 tokenCount = balanceOf(_owner);
@@ -133,10 +94,17 @@ contract BookOwnerShip is BookBase, ERC721 {
         return result;
     }
 
-    function tokenInRent(address _owner) external view returns(uint256[] ownerRentToken) {      // 读者租出的图书
-
+    function buyFromAuthor(address _buyer) external payable whenNotPaused{    // 从作者购买书籍
+        require(balanceOf(msg.sender) < limitAmount);
+        require(books.length < totalAmount);
+        require(msg.value >= price);
+        _creatBook(_buyer);
+        authorAddress.transfer(price);
+        if(msg.value > price) {
+            uint256 excessPrice = msg.value - price;   // safemath ??? 
+            _buyer.transfer(excessPrice);
+        }
     }
 
-    //function tokenMetadata()
 
 }
