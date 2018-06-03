@@ -32,7 +32,7 @@ UserDao.prototype.verifyUser = function (userName, password) {
         obj.randomNum = '';
         resolve(obj);
       }else{
-        reject(new Error('userName or pwd invalid'));
+        resolve(null);
       }
     });
   });
@@ -56,7 +56,7 @@ UserDao.prototype.findUserInfoById = function(id){
 
 
 UserDao.prototype.updatePwd = function (userObj, callback) {
-  var id = userObj._id;
+  let id = userObj._id;
   if (userObj.password) {
     userObj['randomNum'] = getRandom();
     userObj.password = getMD5(userObj.password, userObj.randomNum);

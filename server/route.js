@@ -18,11 +18,8 @@ router.get(URL+'/helloWorld',auth.isAuthenticated,helloWorld.sayHello);
 router.post(URL+"/user/register", user.register);
 router.post(URL+"/user/localLogin",passport.authenticate('local',{
   session:true,
-  successRedirect: URL+"/home",
-  failureRedirect: URL+"/user/localLogin",
-  failureFlash: 'Invalid username or password.',
-  successFlash: 'Welcome!'
-}));
+  failureFlash: true
+}),user.login);
 
 router.post(URL+"/user/localLogout",auth.isAuthenticated,user.logout);
 router.get(URL+"/user/renderUser",auth.isAuthenticated, user.getCurrentUserInfo);
@@ -31,8 +28,8 @@ router.get(URL+"/user/renderUser",auth.isAuthenticated, user.getCurrentUserInfo)
 router.get(URL+"/user/getCopyRightsByUser",auth.isAuthenticated,user.getCopyRightsByUser);
 router.get(URL+"/user/getPurchasedResourcesByUser",auth.isAuthenticated,user.getPurchasedResourcesByUser);
 router.get(URL+"/user/getRentResourcesByUser",auth.isAuthenticated,user.getRentResourcesByUser);
-router.get(URL+"/user/sell",auth.isAuthenticated,user.sell);
-router.get(URL+"/user/rentOut",auth.isAuthenticated,user.rentOut);
+router.get(URL+"/user/purchasedResources/sell",auth.isAuthenticated,user.sell);
+router.get(URL+"/user/purchasedResource/rentOut",auth.isAuthenticated,user.rentOut);
 
 //TODO:获取所有可以二次售卖的图书，分页和查询
 //TODO:获取所有可以租赁的图书，分页和查询

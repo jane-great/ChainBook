@@ -6,7 +6,7 @@ module.exports = {
     if(req.isAuthenticated()) {
       return next();
     }else{
-      res.redirect('/ChainBook/login');
+      res.send({status:10000,msg:"请先登录"});
     }
   }
 };

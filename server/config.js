@@ -11,18 +11,18 @@ function getRootPath() {
   return __dirname;
 }
 //应用主目录
-var path = getRootPath();
+const path = getRootPath();
 
 //配置文件,优先从环境变量读取
-var configPath = process.env.DR_CONFIG ? process.env.DR_CONFIG : path + '/config/chainbook_config.json';
+const configPath = process.env.DR_CONFIG ? process.env.DR_CONFIG : path + '/config/chainbook_config.json';
 
-var config = require('config.json')(configPath);
+const config = require('config.json')(configPath);
 
 //app名称,反应到url中
 config.appName = 'ChainBook';
 
 //应用的日志配置
-var log = {
+const log = {
   level: "INFO",
   file: "chainbook.log",
   maxLogSize: 1024 * 1024 * 10,//日志文件最大为10m
@@ -30,10 +30,16 @@ var log = {
 }
 config.log = log;
 
-//TODO 从外部配置文件读取
-var contract = {
-  url:"http://localhost:7545"
+//合约相关url
+const contract = {
+  url:config.contract.url
 }
 config.contract = contract;
+
+//迅雷api相关
+const thunder = {
+  baseURL:config.thunder.baseURL
+}
+config.thunder = thunder;
 
 module.exports = config;

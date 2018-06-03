@@ -1,12 +1,23 @@
-var userDao = require("../dao/user");
-var log4js = require("log4js");
-var logger = log4js.getLogger("controller/user");
-var encrypt = require('../utils/encrypt');
+const userDao = require("../dao/user");
+const log4js = require("log4js");
+const logger = log4js.getLogger("controller/user");
+const encrypt = require('../utils/encrypt');
+const thunder = require("../utils/thunder");
 
 //预出售的状态
 //TODO 常量
 const preSellStatus = 1;
 const preRentStatus = 1;
+
+/**
+ * 登录
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.login = function(req, res, next) {
+  res.send({status:1,msg:"login success"});
+}
 
 /**
  * 登出操作
@@ -15,7 +26,7 @@ const preRentStatus = 1;
  * @param next
  */
 exports.logout = function(req, res, next) {
-  var user = req.session.passport.user;
+  let user = req.session.passport.user;
   if (user) {
     if (logger.isDebugEnabled()) {
       logger.debug("local logout", "enter local logout", { "user": user });
@@ -24,13 +35,15 @@ exports.logout = function(req, res, next) {
     //delMongodb(session.passport.user);
     req.logout();
     logger.info("local logout", "success to logout from local", { "username": user.userName });
+    res.send({status:1,msg:"success"});
   } else {
     logger.warn("authentication error", "local logout failed,no user in req.session.passport object ,maybe already expired.", {
       "session": req.session.id,
       "user": user
     });
+    res.send({status:0,msg:"local logout failed"});
   }
-  res.redirect(URL + "/login");
+ 
 };
 
 /**
@@ -42,20 +55,26 @@ exports.logout = function(req, res, next) {
  */
 exports.register = async function(req, res, next) {
   logger.info("register user");
-  var random = encrypt.getRandom();
-  var user = {
+  let random = encrypt.getRandom();
+  let user = {
     userName:req.body.userName,
     pwd:encrypt.getMD5(req.body.pwd,random),
     email:req.body.email,
     mobile:req.body.mobile,
     randomNum:random
   }
+  
+  //TODO 校验注册的基本内容
   try{
+    //1、先向迅雷注册账号 TODO 测试
+    let registerData = await thunder.register(user.email);
+    user.account = registerData.service_id;
+    //2、保存账号信息至数据库
     await userDao.add(user);
-    res.send("register success");
+    res.send({status:1,msg:"恭喜注册成功"});
   } catch (e) {
     logger.error("register user fail.",user);
-    res.send("sorry,register fail");
+    res.send({status:0,msg:"注册失败"});
   }
 };
 
@@ -82,7 +101,7 @@ exports.getPurchasedResourcesByUser = async function(req, res, next) {
   var user = req.session.passport.user;
   //2、从数据库中获取当前已购买的资源列表
   let list = await userDao.getPurchasedResourcesByUserId(user._id);
-  res.send(list);
+  res.send({status:1,msg:"success",data:list});
 };
 
 /**
@@ -97,7 +116,7 @@ exports.getRentResourcesByUser = async function(req, res, next) {
   var user = req.session.passport.user;
   //2、从数据库中获取当前已购买的资源列表
   let list = await userDao.getRentResourcesByUserId(user._id);
-  res.send(list);
+  res.send({status:1,msg:"success",data:list});
 };
 
 /**
@@ -111,8 +130,8 @@ exports.getCopyRightsByUser = async function(req, res, next) {
   //1、先拿到当前用户信息，判断用户是否是登录状态
   var user = req.session.passport.user;
   //2、从数据库中获取当前版权的资源列表
-  let list = await userDao.getRentResourcesByUserId(user._id);
-  res.send(list);
+  let list = await userDao.getCopyrightsByUserId(user._id);
+  res.send({status:1,msg:"success",data:list});
 };
 
 /**

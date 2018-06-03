@@ -5,5 +5,11 @@
     "readPreference": "secondaryPreferred",
     "userName": "",
     "password": ""
+  },
+  "contract": {
+    "url":"http://localhost:7545"
+  },
+  "thunder" : {
+    "baseURL":"https://sandbox-walletapi.onethingpcs.com"
   }
 }

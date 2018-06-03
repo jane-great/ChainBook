@@ -52,17 +52,24 @@ passport.use(new LocalStrategy({
 },function(userName,password,done) {
   //校验用户名密码是否正确
   userDao.verifyUser(userName,password).then(function(result){
-    logger.info("passport verify success:",{
-      userName: userName,
-      password: password
-    });
-    done(null,result);
+    if(result){
+      logger.info("passport verify success:",{
+        userName: userName
+      });
+      done(null,result);
+    }else{
+      logger.warn("passport verify fail.",{
+        userName: userName,
+        password: password
+      });
+      done(null,false,{status:0,msg:"Invalid username or password"});
+    }
   }).catch(err =>{
     logger.error("passport verify fail.",{
       userName: userName,
       password: password
     },err);
-    done(err);
+    done(err,null);
   });
 }));
 
@@ -85,14 +92,14 @@ app.use(express.static(path.join(__dirname, '../dist')));
 // 路由的配置需要放置在前面,且使用根目录路由
 app.use('/', mainRouter);
 
-app.get('*', function (req, res, next) {
-  if(req.originalUrl.indexOf('/user')!=0 || req.originalUrl.indexOf('/copyright')!=0 || req.originalUrl.indexOf('/resource')!=0) {
+/*app.get('*', function (req, res, next) {
+  if(req.originalUrl.indexOf('/user') ==0 && req.originalUrl.indexOf('/copyright') == 0 && req.originalUrl.indexOf('/resource') ==0) {
     const html = fs.readFileSync(resolve('../dist/index.html'), 'utf-8');
     res.send(html);
   }else{
     next();
   }
-});
+});*/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

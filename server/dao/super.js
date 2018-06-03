@@ -8,7 +8,7 @@ var SuperDao = function (model) {
 SuperDao.prototype.add = function (modelObj) {
   if (modelObj) {
     return new Promise((resolve, reject) => {
-      var instance = new this.model(modelObj);
+      let instance = new this.model(modelObj);
       instance.save(function (err, savedObj) {
         if(err){
           reject(err);
@@ -27,7 +27,7 @@ SuperDao.prototype.add = function (modelObj) {
 //edit
 SuperDao.prototype.edit = function (modelObj, callback) {
   if (modelObj) {
-    var id = modelObj._id;
+    let id = modelObj._id;
     this.model.findByIdAndUpdate(id, modelObj, function (err) {
       return callback(err);
     });
@@ -37,7 +37,7 @@ SuperDao.prototype.edit = function (modelObj, callback) {
 //update
 SuperDao.prototype.update = function (modelObj, callback) {
   if (modelObj) {
-    var id = modelObj._id;
+    let id = modelObj._id;
     this.model.update({_id: id}, modelObj, function (err, result) {
       return callback(err, result);
     });
