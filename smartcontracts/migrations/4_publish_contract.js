@@ -1,5 +1,5 @@
-var PublishBook = artifacts.require("./PublishBook.sol");
+var Transaction = artifacts.require("./Transaction.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(PublishBook);
+  deployer.deploy(Transaction);
 };
