@@ -5,7 +5,6 @@ const encrypt = require('../utils/encrypt');
 const thunder = require("../utils/thunder");
 
 //预出售的状态
-//TODO 常量
 const preSellStatus = 1;
 const preRentStatus = 1;
 

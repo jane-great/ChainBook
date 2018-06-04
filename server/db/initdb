@@ -34,7 +34,7 @@ db.user.insertOne({
 db.resourceInfo.insertOne({
   "resourceName":"以太坊白皮书",
   "desc":"介绍以太坊的架构基础，及其特性",
-  "limit":10000,
+  "totals":10000,
   "coverImage":"url",
   "price":"10.00",
   "copyrightAddress":"版权合约的地址",

@@ -38,7 +38,7 @@ router.get(URL+"/user/purchasedResource/rentOut",auth.isAuthenticated,user.rentO
 //版权
 router.post(URL+"/copyright/apply",auth.isAuthenticated,resourceCopyright.applyCopyright);
 router.put(URL+"/copyright/upload/sample",auth.isAuthenticated,resourceCopyright.uploadSample);
-router.get(URL+"/copyright/getResourceCopyrightDetailById",auth.isAuthenticated,resourceCopyright.getResourceCopyrightDetailById);
+router.get(URL+"/copyright/getResourceCopyrightDetailById",resourceCopyright.getResourceCopyrightDetailById);
 
 //资源信息
 router.post(URL+"/resource/publish",auth.isAuthenticated,auth.isAuthenticated,resourceInfo.publishResource);

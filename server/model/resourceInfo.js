@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 var resourceInfoSchema = new mongoose.Schema({
   resourceName:String,
   desc:String,
-  limit:Number,
+  total:Number,
   coverImage:String,
   price:String,
   copyrightAddress:String,

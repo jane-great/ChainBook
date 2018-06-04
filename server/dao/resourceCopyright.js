@@ -21,7 +21,6 @@ util.inherits(ResourceCopyrightDao, SuperDao);
 ResourceCopyrightDao.prototype.findStatusById = function(id) {
   try{
     ObjectUtil.notNullAssert(id);
-    
     return new Promise((resolve, reject) => {
       ResourceCopyright.find({_id:id},{auditStatus:1,publishStatus:1},function(err,obj){
         if(err){
@@ -92,7 +91,47 @@ ResourceCopyrightDao.prototype.modifyPublishStatus = function(id,publishStatus){
       );
     });
   }catch(err){
-    logger.error("modifyPublishStatus error.id:{},publishStatus:{}",id,publishStatus,err)
+    logger.error("modifyPublishStatus error.",{
+      id:id,
+      publishStatus:publishStatus
+    },err)
+    return new Promise((reject) =>{
+      reject(err);
+    });
+  }
+}
+
+ResourceCopyrightDao.prototype.updateResourceCopyrightInfo = function(id, copyrightAddress, resourceHash, resourceDhash, auditStatus){
+  try{
+    ObjectUtil.notNullAssert(id);
+    ObjectUtil.notNullAssert(copyrightAddress);
+    ObjectUtil.notNullAssert(resourceHash);
+    ObjectUtil.notNullAssert(resourceDhash);
+    
+    return new Promise((resolve, reject) => {
+      ResourceCopyright.update({'_id':id},
+        {$set:{
+          'auditStatus': auditStatus,
+          'copyrightAddress':copyrightAddress,
+          'resourceHash':resourceHash,
+          'resourceDhash':resourceDhash
+        }},function(err,updateObj){
+          if(err){
+            reject(err);
+          }else{
+            resolve(updateObj);
+          }
+        }
+      );
+    });
+  }catch(err){
+    logger.error("updateResourceCopyrightInfo error",{
+      id:id,
+      auditStatus: auditStatus,
+      copyrightAddress:copyrightAddress,
+      resourceHash:resourceHash,
+      resourceDhash:resourceDhash
+    },err)
     return new Promise((reject) =>{
       reject(err);
     });

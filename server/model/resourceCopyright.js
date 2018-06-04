@@ -7,6 +7,7 @@ var ResourceCopyrightSchema = new mongoose.Schema({
   resourceHash:String,
   resourceDHash:String,
   account:String,
+  localUrl:String,
   author:[new mongoose.Schema({
     _id: false,
     authorName:String,
