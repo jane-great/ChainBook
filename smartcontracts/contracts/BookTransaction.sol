@@ -5,28 +5,28 @@ import "./ERC721Expand.sol";
 
 contract BookTransaction is BookBase, ERC721Expand {
 
-    bytes4 constant InterfaceSignature_ERC165 =  
+    bytes4 constant InterfaceSignature_ERC165 =
         bytes4(keccak256('supportsInterface(bytes4)'));     // erc165标准
 
-    bytes4 constant InterfaceSignature_ERC721 =   
-        bytes4(keccak256('balanceOf(address)')) ^  
-        bytes4(keccak256('ownerOf(uint256)')) ^  
+    bytes4 constant InterfaceSignature_ERC721 =
+        bytes4(keccak256('balanceOf(address)')) ^
+        bytes4(keccak256('ownerOf(uint256)')) ^
         bytes4(keccak256('safeTransferFrom(address,address,uint256,bytes)')) ^
         bytes4(keccak256('safeTransferFrom(address,address,uint256)')) ^
         bytes4(keccak256('setApprovalForAll(address,bool)')) ^
         bytes4(keccak256('isApprovedForAll(address,address)')) ^
-        bytes4(keccak256('approve(address,uint256)')) ^  
-        bytes4(keccak256('transferFrom(address,address,uint256)')) ^  
-        bytes4(keccak256('getApproved(uint256)')) ^  
+        bytes4(keccak256('approve(address,uint256)')) ^
+        bytes4(keccak256('transferFrom(address,address,uint256)')) ^
+        bytes4(keccak256('getApproved(uint256)')) ^
         bytes4(keccak256('tokenURI(uint256)')
-        );     // erc165标准  
+        );     // erc165标准
 
-    function supportsInterface(bytes4 _interfaceID) external view returns (bool)    // 是否实现了规定的erc165标准
-    {   
-  
-        return ((_interfaceID == InterfaceSignature_ERC165) || (_interfaceID == InterfaceSignature_ERC721));  
-    } 
-    
+    function supportsInterface(bytes4 _interfaceID) external view returns (bool)    // 是否实现了规定的标准
+    {
+
+        return ((_interfaceID == InterfaceSignature_ERC165) || (_interfaceID == InterfaceSignature_ERC721));
+    }
+
     function _owns(address _claimant, uint256 _tokenId) internal view returns(bool) {   // 某个地址是否拥有某本图书, 内部接口
         return bookIndexToOwner[_tokenId] == _claimant;
     }
@@ -51,13 +51,13 @@ contract BookTransaction is BookBase, ERC721Expand {
         return bookIndexToSell[_tokenId];
     }
 
-    function sellcancel(uint256 _tokenId) external{     // 交易取消
-        delete bookIndexToSell[_tokenId];   
+    function sellCancel(uint256 _tokenId) external {     // 交易取消
+        delete bookIndexToSell[_tokenId];
     }
 
     function sellFinish(uint256 _tokenId) external {    // 书籍已经出售
         books[_tokenId].transactions++;     // 交易次数+1  safemath???
-        delete bookIndexToSell[_tokenId];   
+        delete bookIndexToSell[_tokenId];
     }
 
     function creatRent(uint256 _tokenId) external {  // 书籍等待出售
@@ -71,17 +71,21 @@ contract BookTransaction is BookBase, ERC721Expand {
     function rentTo(uint256 _tokenId, address _leaser) external {   // 书籍已经出租
         require(!isRent(_tokenId)) ;
         rentAllowedToAddress[_tokenId] = _leaser;
-    }   
+    }
+
+    function tokenIdToRenter(uint256 _tokenId) external view returns(address) {
+        return rentAllowedToAddress[_tokenId];
+    }
 
     function rentCancel(uint256 _tokenId) external {
         delete bookIndexToRent[_tokenId];
-        delete rentAllowedToAddress[_tokenId];  
+        delete rentAllowedToAddress[_tokenId];
     }
 
     function rentFinish(uint256 _tokenId) external {    // 书籍出租完成
         books[_tokenId].rents++;     // 租赁次数+1  safemath???
         delete bookIndexToRent[_tokenId];
-        delete rentAllowedToAddress[_tokenId];   
+        delete rentAllowedToAddress[_tokenId];
     }
 
 
@@ -90,44 +94,44 @@ contract BookTransaction is BookBase, ERC721Expand {
         uint256 _tokenId
     )
     external
-    whenNotPaused 
+    whenNotPaused
     {
-        require(_to != address(0));  
-        require(_to != address(this));  
-        require(_owns(msg.sender, _tokenId));  
+        require(_to != address(0));
+        require(_to != address(this));
+        require(_owns(msg.sender, _tokenId));
         _transfer(msg.sender, _to, _tokenId);
         books[_tokenId].transactions ++;    // safemath ???
     }
 
     function approve(  // 允许第三方调用transfer
-        address _to,  
-        uint256 _tokenId  
-    )  
-        external  
+        address _to,
+        uint256 _tokenId
+    )
+        external
         payable
-        whenNotPaused  
-    {  
-        require(_owns(msg.sender, _tokenId));    
-        _approve(_tokenId, _to);   
-        emit Approval(msg.sender, _to, _tokenId);  
-    } 
+        whenNotPaused
+    {
+        require(_owns(msg.sender, _tokenId));
+        _approve(_tokenId, _to);
+        emit Approval(msg.sender, _to, _tokenId);
+    }
 
     function transferFrom(  // 第三方调用transfer
-        address _from,  
-        address _to,  
-        uint256 _tokenId  
-    )  
-        external  
+        address _from,
+        address _to,
+        uint256 _tokenId
+    )
+        external
         payable
-        whenNotPaused  
-    {  
-        require(_to != address(0));  
-        require(_to != address(this));  
-        require(_approvedFor(msg.sender, _tokenId));  
-        require(_owns(_from, _tokenId));  
-   
-        _transfer(_from, _to, _tokenId);  
-    }  
+        whenNotPaused
+    {
+        require(_to != address(0));
+        require(_to != address(this));
+        require(_approvedFor(msg.sender, _tokenId));
+        require(_owns(_from, _tokenId));
+
+        _transfer(_from, _to, _tokenId);
+    }
 
 
     function publishedAmount() public view returns(uint256) {   //已经发行数量

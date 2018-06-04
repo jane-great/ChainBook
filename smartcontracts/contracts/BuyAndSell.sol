@@ -5,17 +5,20 @@ import "./BuyAndSellBase.sol";
 
 contract BuyAndSell is BuyAndSellBase {
 
-    // function withdrawBalance() external {
-    //     address nftAddress = address(nonFungibleContract);
-    //     require(  
-    //       //  msg.sender == owner ||  
-    //         msg.sender == nftAddress  
-    //     );  
-    //     bool res = nftAddress.send(this.balance); 
-    // }
+    function withdrawBalance() external {
+        // require(
+        //   //  msg.sender == owner ||
+        //     msg.sender == nftAddress
+        // );
+        // nftAddress.send(this.balance);
+    }
 
-    function sell(address _contract, uint256 _tokenId, uint256 _price) external {     // 出售
-        Transaction memory transaction = Transaction(_contract, _tokenId, msg.sender, _price, now);
+    function setFees(uint256 _price) external { // === onlyCEO ===
+        buyCut = _price;
+    }
+
+    function sell(address _contract, uint256 _tokenId, uint256 _price, address _seller) external {     // 出售
+        Transaction memory transaction = Transaction(_contract, _tokenId, _seller, _price, now);
         _addSell(_contract, _tokenId, transaction);
     }
 
@@ -31,7 +34,7 @@ contract BuyAndSell is BuyAndSellBase {
     function buy(address _contract, uint256 _tokenId, address _buyer) external payable {       //购买
         _buy(_contract, _tokenId, msg.value);
         _transfer(_contract, _buyer, _tokenId);
-        
+
     }
 
     function getSellInfo(address _contract, uint256 _tokenId) external view returns    // 获得交易信息
@@ -56,5 +59,4 @@ contract BuyAndSell is BuyAndSellBase {
         require(uint256(_price) == _price);
         indexToTransaction[index].price = _price;
     }
-
 }
