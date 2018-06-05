@@ -18,12 +18,12 @@ const CopyrightContractDao = class dao {
   constructor(){
     fs.readFile(BookCopyrightCreate_SOURCE,function(err, source) {
       //编译合约
-      let bookCopyrightCreateComplied = web3.eth.compile.solidity(source);
-      dao.bookCopyrightCreateComplied = bookCopyrightCreateComplied;
-      logger.info("bookCopyrightCreateComplied:",bookCopyrightCreateComplied);
-      logger.info("ABI definition:",bookCopyrightCreateComplied["info"]["abiDefinition"]);
-      let abiDefinition = bookCopyrightCreateComplied["info"]["abiDefinition"];
-      dao.bookCopyrightCreateContact = web3.eth.contract(abiDefinition);
+      //let bookCopyrightCreateComplied = web3.eth.compile.solidity(source);
+      //dao.bookCopyrightCreateComplied = bookCopyrightCreateComplied;
+      //logger.info("bookCopyrightCreateComplied:",bookCopyrightCreateComplied);
+      //logger.info("ABI definition:",bookCopyrightCreateComplied["info"]["abiDefinition"]);
+      //let abiDefinition = bookCopyrightCreateComplied["info"]["abiDefinition"];
+      //dao.bookCopyrightCreateContact = web3.eth.contract(abiDefinition);
       
     });
   }

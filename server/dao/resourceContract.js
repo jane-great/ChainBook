@@ -19,12 +19,12 @@ const ResourceContractDao = class dao {
   constructor(){
     fs.readFile(BookOwnerShip_SOURCE,function(err, source) {
       //编译合约
-      let complied = web3.eth.compile.solidity(source);
-      dao.complied = complied;
-      logger.info("bookCopyrightCreateComplied:",complied);
-      logger.info("ABI definition:",complied["info"]["abiDefinition"]);
-      let abiDefinition = complied["info"]["abiDefinition"];
-      dao.contact = web3.eth.contract(abiDefinition);
+      //let complied = web3.eth.compile.solidity(source);
+      //dao.complied = complied;
+      //logger.info("bookCopyrightCreateComplied:",complied);
+      //logger.info("ABI definition:",complied["info"]["abiDefinition"]);
+      //let abiDefinition = complied["info"]["abiDefinition"];
+      //dao.contact = web3.eth.contract(abiDefinition);
     });
   }
   

@@ -5,6 +5,7 @@ var resourceInfoDao = require("../dao/resourceInfo");
 var resourceCopyrightDao = require("../dao/resourceCopyright");
 var resourceContractDao = require("../dao/resourceContract");
 const objectUtils = require("../utils/objectUtils");
+const localUpload = require("../component/localUpload");
 
 /**
  * 发布资源，post方法
@@ -65,9 +66,25 @@ exports.publishResource = async function(req, res, next) {
  * @param next
  */
 exports.uploadCoverImg = function(req, res, next) {
-  logger.info("uploadCoverImg");
-  //1、先登记发布的资源基本数据
-  res.send("uploadCoverImg");
+  let upload = localUpload.imageUpload.single("coverImage");
+  upload(req,res,function(err) {
+    if(err){
+      logger.error("upload fail",err);
+      res.send({status:0,msg:'上传图片失败'});
+      return;
+    }
+    var file = req.file;
+    if(!file){
+      res.send({status:0,msg:'上传图片失败'});
+      return;
+    }
+    logger.info('file info',{
+      mimetype:file.mimetype,
+      originalname:file.originalname,
+      size:file.size,
+      path:file.path });
+    res.send({status:1,msg:'success',data:{path:file.path.replace(/\\/g,"/")}});
+  });
 }
 
 exports.buyFromAuthor = function(req, res, next){

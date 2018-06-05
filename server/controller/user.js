@@ -95,7 +95,7 @@ exports.getCurrentUserInfo = function(req, res, next) {
  * @param next
  */
 exports.getPurchasedResourcesByUser = async function(req, res, next) {
-  logger.info("get purchased resources");
+  logger.info("get purchased file");
   //1、先拿到当前用户信息，判断用户是否是登录状态
   var user = req.session.passport.user;
   //2、从数据库中获取当前已购买的资源列表
@@ -110,7 +110,7 @@ exports.getPurchasedResourcesByUser = async function(req, res, next) {
  * @param next
  */
 exports.getRentResourcesByUser = async function(req, res, next) {
-  logger.info("get rent resources");
+  logger.info("get rent file");
   //1、先拿到当前用户信息，判断用户是否是登录状态
   var user = req.session.passport.user;
   //2、从数据库中获取当前已购买的资源列表
@@ -125,7 +125,7 @@ exports.getRentResourcesByUser = async function(req, res, next) {
  * @param next
  */
 exports.getCopyRightsByUser = async function(req, res, next) {
-  logger.info("get rent resources");
+  logger.info("get rent file");
   //1、先拿到当前用户信息，判断用户是否是登录状态
   var user = req.session.passport.user;
   //2、从数据库中获取当前版权的资源列表
@@ -141,7 +141,7 @@ exports.getCopyRightsByUser = async function(req, res, next) {
  */
 exports.sell = async function(req, res, next) {
   let tokenId = req.param("tokenId");
-  logger.info("selling resources.", {
+  logger.info("selling file.", {
     tokenId: tokenId
   });
   
@@ -173,7 +173,7 @@ exports.sell = async function(req, res, next) {
  */
 exports.rentOut = async function(req, res, next) {
   let tokenId = req.param("tokenId");
-  logger.info("renting out resources.", {
+  logger.info("renting out file.", {
     tokenId: tokenId
   });
   

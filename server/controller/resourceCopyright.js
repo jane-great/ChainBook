@@ -1,10 +1,11 @@
-var log4js = require('log4js');
-var logger = log4js.getLogger('chainbook');
-var userDao = require("../dao/user");
-var resourceCopyrightDao = require("../dao/resourceCopyright");
-var copyrightContractDao = require("../dao/copyrightContract");
+const log4js = require('log4js');
+const logger = log4js.getLogger('controller/resourceCopyright');
+const userDao = require("../dao/user");
+const resourceCopyrightDao = require("../dao/resourceCopyright");
+const copyrightContractDao = require("../dao/copyrightContract");
 const objectUtils = require("../utils/objectUtils");
 const encrypt = require("../utils/encrypt");
+const localUpload = require("../component/localUpload");
 
 const NO_AUDIT = 0;
 const NO_PUBLISH = 0;
@@ -53,9 +54,25 @@ exports.applyCopyright = async function(req,res,next){
  * @param next
  */
 exports.uploadSample = function(req,res,next){
-  logger.info("upload sample");
-  
-  res.send("upload sample");
+  let upload = localUpload.fileUpload.single("sample");
+  upload(req,res,function(err) {
+    if(err){
+      logger.error("upload fail",err);
+      res.send({status:0,msg:'上传样本失败'});
+      return;
+    }
+    var file = req.file;
+    if(!file){
+      res.send({status:0,msg:'上传样本失败'});
+      return;
+    }
+    logger.info('file info',{
+      mimetype:file.mimetype,
+      originalname:file.originalname,
+      size:file.size,
+      path:file.path });
+    res.send({status:1,msg:'success',data:{path:file.path.replace(/\\/g,"/")}});
+  });
 }
 
 /**

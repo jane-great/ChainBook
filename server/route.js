@@ -7,6 +7,11 @@ var helloWorld = require('./controller/helloWorld');
 var config = require('./config');
 var passport = require("passport");
 var auth = require("./controller/auth");
+const fs = require("fs");
+const multer  = require('multer');
+//图片上传 TODO 参数化
+const imageUpload = multer({ dest: 'local/image/' });
+const fileUpload =  multer({ dest: 'local/file/' });
 
 var URL = "/" + config.appName;
 
@@ -37,14 +42,19 @@ router.get(URL+"/user/purchasedResource/rentOut",auth.isAuthenticated,user.rentO
 
 //版权
 router.post(URL+"/copyright/apply",auth.isAuthenticated,resourceCopyright.applyCopyright);
-router.put(URL+"/copyright/upload/sample",auth.isAuthenticated,resourceCopyright.uploadSample);
+router.post(URL+"/copyright/upload/sample",auth.isAuthenticated,resourceCopyright.uploadSample);
 router.get(URL+"/copyright/getResourceCopyrightDetailById",resourceCopyright.getResourceCopyrightDetailById);
 
 //资源信息
 router.post(URL+"/resource/publish",auth.isAuthenticated,auth.isAuthenticated,resourceInfo.publishResource);
-router.put(URL+"/resource/uploadCoverImg",auth.isAuthenticated,resourceInfo.uploadCoverImg);
+router.post(URL+"/resource/upload/coverImg",auth.isAuthenticated,resourceInfo.uploadCoverImg);
+//测试上传用
+/*router.get(URL+'/form',function(req, res, next) {
+  fs.readFile('dist/testUploadImage.html', {encoding: 'utf8'},function(err,data) {
+    res.send(data);
+  });
+});*/
 router.get(URL+"/resource/getResourceDetailById",auth.isAuthenticated,resourceInfo.getResourceDetailById);
 router.get(URL+"/resource/buy",auth.isAuthenticated,resourceInfo.buy);
 router.get(URL+"/resource/rent",auth.isAuthenticated,resourceInfo.rent);
-
 module.exports = router;
