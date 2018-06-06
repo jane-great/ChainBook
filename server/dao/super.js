@@ -54,9 +54,9 @@ SuperDao.prototype.deleteById = function (id, callback) {
 }
 
 //findById
-SuperDao.prototype.findById = function (id, callback) {
+SuperDao.prototype.findById = function (id) {
   return new Promise((resolve, reject) => {
-    this.model.findById(id, function (err, obj) {
+    this.model.findOne({_id:id}, function (err, obj) {
       if(err) {
         reject(err);
       }else{
@@ -88,7 +88,7 @@ SuperDao.prototype.findOne = function (option) {
         resolve(obj);
       }
     });
-  })
+  });
 }
 
 //remove
@@ -104,5 +104,16 @@ SuperDao.prototype.removeAll = function (callback) {
   });
 }
 
+SuperDao.prototype.count = function(option){
+  return new Promise((resolve, reject) => {
+    this.model.count(option, function (err, count) {
+      if(err){
+        reject(err);
+      }else {
+        resolve(count);
+      }
+    }).count();
+  });
+}
 
 module.exports = SuperDao;

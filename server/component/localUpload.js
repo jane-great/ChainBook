@@ -75,7 +75,6 @@ var fileUpload = multer({
   
 });
 
-//导出对象
 module.exports = {
   imageUpload:imageUpload,
   fileUpload:fileUpload

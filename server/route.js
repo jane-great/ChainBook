@@ -7,11 +7,6 @@ var helloWorld = require('./controller/helloWorld');
 var config = require('./config');
 var passport = require("passport");
 var auth = require("./controller/auth");
-const fs = require("fs");
-const multer  = require('multer');
-//图片上传 TODO 参数化
-const imageUpload = multer({ dest: 'local/image/' });
-const fileUpload =  multer({ dest: 'local/file/' });
 
 var URL = "/" + config.appName;
 
@@ -36,10 +31,6 @@ router.get(URL+"/user/getRentResourcesByUser",auth.isAuthenticated,user.getRentR
 router.get(URL+"/user/purchasedResources/sell",auth.isAuthenticated,user.sell);
 router.get(URL+"/user/purchasedResource/rentOut",auth.isAuthenticated,user.rentOut);
 
-//TODO:获取所有可以二次售卖的图书，分页和查询
-//TODO:获取所有可以租赁的图书，分页和查询
-//TODO:获取所有首发图书，分页和查询
-
 //版权
 router.post(URL+"/copyright/apply",auth.isAuthenticated,resourceCopyright.applyCopyright);
 router.post(URL+"/copyright/upload/sample",auth.isAuthenticated,resourceCopyright.uploadSample);
@@ -54,7 +45,12 @@ router.post(URL+"/resource/upload/coverImg",auth.isAuthenticated,resourceInfo.up
     res.send(data);
   });
 });*/
-router.get(URL+"/resource/getResourceDetailById",auth.isAuthenticated,resourceInfo.getResourceDetailById);
-router.get(URL+"/resource/buy",auth.isAuthenticated,resourceInfo.buy);
-router.get(URL+"/resource/rent",auth.isAuthenticated,resourceInfo.rent);
+router.get(URL+"/resource/getResourceDetailById",resourceInfo.getResourceDetailById);
+router.post(URL+"/resource/getResourceListByPage",resourceInfo.getResourceListByPage);
+router.post(URL+"/resource/getPurchasedResourceListByPage",resourceInfo.getPurchasedResourceListByPage);
+router.post(URL+"/resource/getTenantableResourceListByPage",resourceInfo.getTenantableResourceListByPage);
+router.get(URL+"/resource/getPurchasedResourceOwnerListById",resourceInfo.getPurchasedResourceOwnerListById);
+router.get(URL+"/resource/getTenantableResourceOwnerListById",resourceInfo.getTenantableResourceOwnerListById);
+router.post(URL+"/resource/buy",auth.isAuthenticated,resourceInfo.buy);
+router.post(URL+"/resource/rent",auth.isAuthenticated,resourceInfo.rent);
 module.exports = router;

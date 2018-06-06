@@ -26,7 +26,7 @@ exports.applyCopyright = async function(req,res,next){
     account:user.account,
     //TODO 支持多个author
     author:[{
-      authorName:req.body.author.authorName,
+      authorName:req.body.authorName,
       identityType:req.body.identityType,
       identityNum:req.body.identityNum
     }],
@@ -112,7 +112,7 @@ exports.registerCopyright = async function(userObj,id){
  * @param next
  */
 exports.getResourceCopyrightDetailById = async function(req, res, next) {
-  let id = req.param.id;
+  let id = req.param('id');
   logger.info("getResourceCopyrightDetailById",{id:id});
   try{
     objectUtils.notNullAssert(id);

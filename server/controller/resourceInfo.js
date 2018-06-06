@@ -14,7 +14,6 @@ const localUpload = require("../component/localUpload");
  * @param next
  */
 exports.publishResource = async function(req, res, next) {
-  logger.info("publish resource");
   let copyrightId = req.body.copyrightId;
   let resourceName = req.body.resourceName;
   let desc = req.body.desc;
@@ -27,7 +26,7 @@ exports.publishResource = async function(req, res, next) {
     //1、先校验该版权是否具备发行的资格
     let copyright = await resourceCopyrightDao.findOne({_id:id,auditStatus:1});
     if(!copyright){
-      res.send({status:0,msg:"改版权目前不具备发行资格"});
+      res.send({status:0,msg:"该版权目前不具备发行资格"});
       return;
     }
     //2、先将发行的数据登记进数据库中
@@ -44,18 +43,20 @@ exports.publishResource = async function(req, res, next) {
     await resourceInfoDao.add(resourceInfo);
     //3、创建资源合约
     let result = await resourceContractDao.publishResource(user,resourceInfo);
+    //4、登记发行状态、合约地址
+    //5、返回结果
+    res.send({status:1,msg:"发行成功"});
   }catch (e) {
     logger.error("publish fail",{
+      copyrightId:copyrightId,
       resourceName:resourceName,
       desc:desc,
       total:total,
       coverImage:coverImage,
       price:price,
-      copyrightAddress:copyright.copyrightAddress,
-      authorAccount:authorAccount,
-      hasSellOut:0,
+      authorAccount:authorAccount
     },e);
-    res.send({status:0,msg:"发行失败请重发行"});
+    res.send({status:0,msg:"发行失败,请重发行"});
   }
 }
 
@@ -122,11 +123,11 @@ exports.rent = function(req, res, next) {
  * @param next
  */
 exports.getResourceDetailById = async function(req, res, next) {
-  let id = req.param.id;
+  let id = req.param("id");
   logger.info("getResourceDetailById",{id:id});
   try{
     objectUtils.notNullAssert(id);
-    let resourceInfo = await resourceInfoDao.findById(id);
+    let resourceInfo = await resourceInfoDao.findSellOutStatusById(id);
     res.send({status:1,msg:"success",data:resourceInfo});
   }catch (e) {
     logger.error("get resource info detail fail.",{
@@ -135,3 +136,125 @@ exports.getResourceDetailById = async function(req, res, next) {
     res.send({status:0,msg:"get resource info detail fail."});
   }
 }
+
+/**
+ * 根据分页获取所有可以购买的首发资源
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.getResourceListByPage = async function(req, res, next) {
+  let page = req.body.page;
+  try{
+    if(!page){
+      page = {
+        pageSize:10,
+        lastId:""
+      }
+    }
+    let resourceInfoList = await resourceInfoDao.findAllResource(page);
+    let total = await resourceInfoDao.count({hasSellOut:0});
+    if(resourceInfoList !== undefined && resourceInfoList.length > 0 ){
+      page.lastId = resourceInfoList[resourceInfoList.length -1]._id;
+    }
+    let data = {
+      total:total,
+      resourceInfoList: resourceInfoList,
+      page: page
+    }
+    res.send({status:1,msg:"success",data:data});
+  }catch (e) {
+    logger.error("get resource list fail.",{
+      page:page
+    },e);
+    res.send({status:0,msg:"get resource list fail."});
+  }
+}
+
+exports.getPurchasedResourceListByPage = async function(req, res, next) {
+  let page = req.body.page;
+  try{
+    if(!page){
+      page = {
+        pageSize:10,
+        lastId:""
+      }
+    }
+    let resourceInfoList = await resourceInfoDao.findPurchasedResources(page);
+    let total = await resourceInfoDao.count({purchasedResources:{$elemMatch:{$ne:null}}});
+    if(resourceInfoList !== undefined && resourceInfoList.length > 0 ){
+      page.lastId = resourceInfoList[resourceInfoList.length -1]._id;
+    }
+    let data = {
+      total:total,
+      resourceInfoList: resourceInfoList,
+      page: page
+    }
+    res.send({status:1,msg:"success",data:data});
+  }catch (e) {
+    logger.error("get purchased resource list fail.",{
+      page:page
+    },e);
+    res.send({status:0,msg:"get purchased resource list fail."});
+  }
+}
+
+exports.getTenantableResourceListByPage = async function(req, res, next) {
+  let page = req.body.page;
+  try{
+    if(!page){
+      page = {
+        pageSize:10,
+        lastId:""
+      }
+    }
+    let resourceInfoList = await resourceInfoDao.findTenantableResources(page);
+    let total = await resourceInfoDao.count({tenantableResources:{$elemMatch:{$ne:null}}});
+    if(resourceInfoList !== undefined && resourceInfoList.length > 0 ){
+      page.lastId = resourceInfoList[resourceInfoList.length -1]._id;
+    }
+    let data = {
+      total:total,
+      resourceInfoList: resourceInfoList,
+      page: page
+    }
+    res.send({status:1,msg:"success",data:data});
+  }catch (e) {
+    logger.error("get tenantable resource list fail.",{
+      page:page
+    },e);
+    res.send({status:0,msg:"get tenantable resource list fail."});
+  }
+}
+
+exports.getPurchasedResourceOwnerListById = async function(req,res,next) {
+  let id = req.param("id");
+  logger.info("getPurchasedResourceOwnerListById",{id:id});
+  try{
+    objectUtils.notNullAssert(id);
+    let ownerList = await resourceInfoDao.findPurchasedResourceOwners(id);
+    res.send({status:1,msg:"success",data:ownerList});
+  }catch (e) {
+    logger.error("get resource info detail fail.",{
+      id:id
+    },e);
+    res.send({status:0,msg:"get purchased resource owners fail."});
+  }
+}
+
+exports.getTenantableResourceOwnerListById = async function(req,res,next) {
+  let id = req.param("id");
+  logger.info("getTenantableResourceOwnerListById",{id:id});
+  try{
+    objectUtils.notNullAssert(id);
+    let ownerList = await resourceInfoDao.findTenantableResourceOwners(id);
+    res.send({status:1,msg:"success",data:ownerList});
+  }catch (e) {
+    logger.error("getTenantableResourceOwnerListById fail.",{
+      id:id
+    },e);
+    res.send({status:0,msg:"get tenantable resource owners fail."});
+  }
+}
+
+
