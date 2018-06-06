@@ -1,0 +1,28 @@
+* {
+  box-sizing: border-box;
+}
+
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, form, fieldset, input, button, textarea, p, th, td {
+  padding: 0;
+  margin: 0;
+}
+
+fieldset, img {
+  border: 0;
+}
+
+ol, ul, li {
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+body {
+  font-family: Pingfang SC, Microsoft YaHei, simsun, Helvetica, Hiragino Sans GB, Arial, sans-serif;
+  font-size: 14px;
+}
+
+a, a:hover, a:active { color: #000; text-decoration: none; }

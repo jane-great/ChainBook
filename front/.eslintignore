@@ -1,0 +1,7 @@
+/build/
+/config/
+/dist/
+/src/router
+modified_modules/**
+/*.js
+

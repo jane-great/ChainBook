@@ -1,0 +1,25 @@
+{
+  "code": 0,
+  "message": "succeed",
+  "data": [{
+    "id": 1,
+    "title": "A",
+    "show": 1,
+    "sort": 1
+  }, {
+    "id": 1,
+    "title": "B+",
+    "show": 1,
+    "sort": 2
+  }, {
+    "id": 1,
+    "title": "B",
+    "show": 1,
+    "sort": 3
+  }, {
+    "id": 1,
+    "title": "B-",
+    "show": 0,
+    "sort": 4
+  }]
+}
