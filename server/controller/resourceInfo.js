@@ -146,12 +146,7 @@ exports.getResourceDetailById = async function(req, res, next) {
 exports.getResourceListByPage = async function(req, res, next) {
   let page = req.body.page;
   try{
-    if(!page){
-      page = {
-        pageSize:10,
-        lastId:""
-      }
-    }
+    page = validatePage(page);
     let resourceInfoList = await resourceInfoDao.findAllResource(page);
     let total = await resourceInfoDao.count({hasSellOut:0});
     if(resourceInfoList !== undefined && resourceInfoList.length > 0 ){
@@ -167,19 +162,14 @@ exports.getResourceListByPage = async function(req, res, next) {
     logger.error("get resource list fail.",{
       page:page
     },e);
-    res.send({status:0,msg:"get resource list fail."});
+    res.send({status:0,msg:"get resource list fail."+e.message});
   }
 }
 
 exports.getPurchasedResourceListByPage = async function(req, res, next) {
   let page = req.body.page;
   try{
-    if(!page){
-      page = {
-        pageSize:10,
-        lastId:""
-      }
-    }
+    page = validatePage(page);
     let resourceInfoList = await resourceInfoDao.findPurchasedResources(page);
     let total = await resourceInfoDao.count({purchasedResources:{$elemMatch:{$ne:null}}});
     if(resourceInfoList !== undefined && resourceInfoList.length > 0 ){
@@ -195,19 +185,14 @@ exports.getPurchasedResourceListByPage = async function(req, res, next) {
     logger.error("get purchased resource list fail.",{
       page:page
     },e);
-    res.send({status:0,msg:"get purchased resource list fail."});
+    res.send({status:0,msg:"get purchased resource list fail."+e.message});
   }
 }
 
 exports.getTenantableResourceListByPage = async function(req, res, next) {
   let page = req.body.page;
   try{
-    if(!page){
-      page = {
-        pageSize:10,
-        lastId:""
-      }
-    }
+    page = validatePage(page);
     let resourceInfoList = await resourceInfoDao.findTenantableResources(page);
     let total = await resourceInfoDao.count({tenantableResources:{$elemMatch:{$ne:null}}});
     if(resourceInfoList !== undefined && resourceInfoList.length > 0 ){
@@ -223,7 +208,7 @@ exports.getTenantableResourceListByPage = async function(req, res, next) {
     logger.error("get tenantable resource list fail.",{
       page:page
     },e);
-    res.send({status:0,msg:"get tenantable resource list fail."});
+    res.send({status:0,msg:"get tenantable resource list fail."+e.message});
   }
 }
 
@@ -255,6 +240,21 @@ exports.getTenantableResourceOwnerListById = async function(req,res,next) {
     },e);
     res.send({status:0,msg:"get tenantable resource owners fail."});
   }
+}
+
+function validatePage(page){
+  if (!page){
+    return {
+      pageSize:10,
+      lastId:""
+    }
+  }
+  
+  if(page.pageSize<=0 || page.pageSize>20){
+    throw new Error("pageSize必须在(0,20]之间.");
+  }
+  
+  return page;
 }
 
 
