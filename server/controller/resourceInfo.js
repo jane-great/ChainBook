@@ -6,6 +6,7 @@ var resourceCopyrightDao = require("../dao/resourceCopyright");
 var resourceContractDao = require("../dao/resourceContract");
 const objectUtils = require("../utils/objectUtils");
 const localUpload = require("../component/localUpload");
+const config = require("../config");
 
 /**
  * 发布资源，post方法
@@ -84,7 +85,7 @@ exports.uploadCoverImg = function(req, res, next) {
       originalname:file.originalname,
       size:file.size,
       path:file.path });
-    res.send({status:1,msg:'success',data:{path:file.path.replace(/\\/g,"/")}});
+    res.send({status:1,msg:'success',data:{path:'http://'+config.server.domain+'/images/'+file.filename}});
   });
 }
 

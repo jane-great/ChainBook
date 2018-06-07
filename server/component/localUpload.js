@@ -2,15 +2,32 @@ const multer  = require('multer');
 const log4js = require('log4js');
 const logger = log4js.getLogger('component/localUpload');
 const encrypt = require('../utils/encrypt');
+const config = require('../config');
+const mkdirp = require('mkdirp');
+const fs = require('fs');
 
 //TODO 参数化
-const ImagePath = "local/image";
-const FilePath = "local/file";
+const ImagePath = config.local_upload.images;
+const FilePath = config.local_upload.files;
 
 var imageStorage = multer.diskStorage({
   //设置上传后文件路径，uploads文件夹会自动创建。
   destination: function (req, file, cb) {
-    cb(null, ImagePath);
+    // 判断文件夹是否存在
+    fs.stat(ImagePath, (err) => {
+      if (err) {
+        // 创建文件夹
+        mkdirp(ImagePath, (err) => {
+          if (err) {
+            cb(err);
+          } else {
+            cb(null, ImagePath);
+          }
+        });
+      } else {
+        cb(null, ImagePath);
+      }
+    });
   },
   //给上传文件重命名，获取添加后缀名
   filename: function (req, file, cb) {
@@ -44,7 +61,21 @@ var imageUpload = multer({
 const fileStorage = multer.diskStorage({
   //设置上传后文件路径，uploads文件夹会自动创建。
   destination: function (req, file, cb) {
-    cb(null, FilePath);
+    // 判断文件夹是否存在
+    fs.stat(FilePath, (err) => {
+      if (err) {
+        // 创建文件夹
+        mkdirp(FilePath, (err) => {
+          if (err) {
+            cb(err);
+          } else {
+            cb(null, FilePath);
+          }
+        });
+      } else {
+        cb(null, FilePath);
+      }
+    });
   },
   //给上传文件重命名，获取添加后缀名
   filename: function (req, file, cb) {

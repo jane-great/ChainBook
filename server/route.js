@@ -7,6 +7,7 @@ var helloWorld = require('./controller/helloWorld');
 var config = require('./config');
 var passport = require("passport");
 var auth = require("./controller/auth");
+var fs = require("fs");
 
 var URL = "/" + config.appName;
 
@@ -37,14 +38,14 @@ router.post(URL+"/copyright/upload/sample",auth.isAuthenticated,resourceCopyrigh
 router.get(URL+"/copyright/getResourceCopyrightDetailById",resourceCopyright.getResourceCopyrightDetailById);
 
 //资源信息
-router.post(URL+"/resource/publish",auth.isAuthenticated,auth.isAuthenticated,resourceInfo.publishResource);
-router.post(URL+"/resource/upload/coverImg",auth.isAuthenticated,resourceInfo.uploadCoverImg);
+router.post(URL+"/resource/publish",auth.isAuthenticated,resourceInfo.publishResource);
+router.post(URL+"/resource/upload/coverImg",resourceInfo.uploadCoverImg);
 //测试上传用
-/*router.get(URL+'/form',function(req, res, next) {
+router.get(URL+'/form',function(req, res, next) {
   fs.readFile('dist/testUploadImage.html', {encoding: 'utf8'},function(err,data) {
     res.send(data);
   });
-});*/
+});
 router.get(URL+"/resource/getResourceDetailById",resourceInfo.getResourceDetailById);
 router.post(URL+"/resource/getResourceListByPage",resourceInfo.getResourceListByPage);
 router.post(URL+"/resource/getPurchasedResourceListByPage",resourceInfo.getPurchasedResourceListByPage);
