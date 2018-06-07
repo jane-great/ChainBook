@@ -25,7 +25,9 @@
       </nav>
     </header>
 
-    <router-view class="container" />
+    <div class="container">
+      <router-view />
+    </div>
 
     <footer class="footer">
       <p>
@@ -48,6 +50,7 @@
 
 <script>
 import LoginModal from 'components/login/LoginModal';
+
 export default {
   name: 'App',
   components: {
@@ -74,7 +77,7 @@ export default {
         index: '4'
       }, {
         name: '个人管理',
-        link: '/',
+        link: '/User',
         index: '5'
       }],
       loginModal: {
@@ -88,11 +91,16 @@ export default {
       }
     };
   },
-  created() {
+  mounted() {
     // this.$message({
     //   message: '恭喜你，这是一条成功消息',
     //   type: 'success'
     // });
+    console.log('ready');
+    // this.$api.resource.getResourceDetailById('5b18002108585480f53bce3b').then((data) => {
+    //   console.log(data);
+    // });
+    this.$api.base.getForText().then(() => {});
   },
   methods: {
     handleOpenLoginModal(type) {
@@ -113,11 +121,10 @@ export default {
 
 <style lang="scss" scoped>
 @import '~assets/scss/base.scss';
-#app {
+.app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 20px;
 }
@@ -150,6 +157,7 @@ body {
     clear: both;
     .el-menu-item {
       width: 100px;
+      text-align: center;
     }
   }
   .login-info {
@@ -162,7 +170,7 @@ body {
 .container {
   margin: 0 auto;
   width: 1200px;
-  margin-top: 10px;
+  margin-top: 15px;
   min-height: 750px;
 }
 .footer {

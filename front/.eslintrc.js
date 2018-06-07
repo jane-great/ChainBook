@@ -54,7 +54,7 @@ module.exports = {
       'ignoreStrings': true,
       'ignoreTemplateLiterals': true
     }],
-    'import/extensions': ['error', 'always', {
+    'import/extensions': ['error', 'never', { // TODO： 从always改到了never
       'js': 'never',
       'vue': 'never'
     }],
@@ -64,7 +64,7 @@ module.exports = {
     }],
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-    'prefer-promise-reject-errors': ["error", {
+    'prefer-promise-reject-errors': ["off", {
       "allowEmptyReject": true
     }]
   }

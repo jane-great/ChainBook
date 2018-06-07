@@ -11,8 +11,8 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api': {
-        target: 'http://baike.baidu.com/',
+      '/ChainBook': {
+        target: 'http://159.203.96.61:3000/',
         changeOrigin: true
       }
     },

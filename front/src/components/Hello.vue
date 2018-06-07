@@ -1,7 +1,7 @@
 <template>
   <div>
-    <p>测试亚敏，啊哈哈啊啊哈</p>
-    <button @click="handleGetApi">跟api</button>
+    <p>第一个测试页面</p>
+    <button @click="handleGetApi">获取api测试</button>
   </div>
 </template>
 
@@ -18,15 +18,13 @@ export default {
   },
   methods: {
     handleOpen(key, keyPath) {
-      console.log(key, keyPath);
+      console.log(key, keyPath);  // disable-eslint-line no-console
     },
     handleClose(key, keyPath) {
-      console.log(key, keyPath);
+      console.log(key, keyPath); // disable-eslint-line no-console
     },
     handleGetApi() {
-      console.log('aaaaa');
       this.$api.base.getContent().then((data) => {
-        console.log(data);
       });
     }
   }

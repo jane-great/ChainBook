@@ -1,20 +1,25 @@
 import axios from 'axios';
 import qs from 'qs';
-
-import {
-  pushLoading,
-  popLoading
-} from 'src/vuex/actions/ui';
+import { Loading } from 'element-ui';
 
 import baseAPI from 'src/apis/base';
+import userAPI from 'src/apis/user';
+import resourceAPI from 'src/apis/resource';
+import copyrightAPI from 'src/apis/copyright';
 
-function getRequestInstance(store) {
+let loadingInstance = null;
+function getRequestInstance() {
   const instance = axios.create();
 
   // 发送请求前，对 request object 做处理
   instance.interceptors.request.use((config) => {
-    if (!config.hideLoading) pushLoading(store);
+    loadingInstance = Loading.service({
+      fullscreen: true
+    });
     const headers = {};
+
+    // 给 config.url 添加上baseUrl
+    config.url = `/ChainBook/${config.url}`;
 
     // 后端不支持 json 格式的 data，需要将 json 格式转为 x-www-form-urlencoded
     if (typeof config.data === 'object' && !(config.data instanceof FormData)) {
@@ -27,7 +32,7 @@ function getRequestInstance(store) {
     if (!config.params) {
       config.params = {};
     }
-    Object.assign(config.params, window.phpData, { _t: Date.now() });
+    Object.assign(config.params, { _t: Date.now() });
 
     // 添加 X-Requested-With
     Object.assign(headers, { 'X-Requested-With': 'XMLHttpRequest' });
@@ -37,8 +42,9 @@ function getRequestInstance(store) {
 
   // 收到回复后对 response 做处理
   instance.interceptors.response.use((response) => {
-    console.log(response);
-    if (!response.config.hideLoading) popLoading(store);
+    loadingInstance = Loading.service({
+      fullscreen: true
+    });
 
     switch (response.data.code) {
       // 特殊的错误处理
@@ -75,7 +81,7 @@ function getRequestInstance(store) {
         return Promise.reject(response.data.message);
     }
   }, (error) => {
-    if (!error.response.config.hideLoading) popLoading(store);
+    loadingInstance.close();
     return Promise.reject(`与服务器通信遇到了问题（${error.message}）`);
   });
 
@@ -88,7 +94,10 @@ export default function plugins(store) {
   store.api = Object.assign(
     {},
     baseAPI(axios.request),
-    { base: baseAPI(axios.request) }
+    { base: baseAPI(axios.request) },
+    { user: userAPI(axios.request) },
+    { resource: resourceAPI(axios.request) },
+    { copyright: copyrightAPI(axios.request) }
   );
   store.ajax = axios;
 }

@@ -38,6 +38,7 @@ export default {
       if (!value) {
         return callback(new Error('账号不能为空'));
       }
+      return '';
     };
     const validatePass = (rule, value, callback) => {
       if (value === '') {
@@ -76,11 +77,11 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          confirmFn();
+          this.confirmFn();
         } 
         return false;
       });
     }
   }
-}
+};
 </script>
