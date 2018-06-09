@@ -1,7 +1,7 @@
 export default function (request) {
   return {
     // 登录
-    localLogin(userName, pwd) {
+    localLogin({ userName, pwd }) {
       return request({
         url: '/user/localLogin',
         method: 'post',
@@ -19,10 +19,15 @@ export default function (request) {
       }).then(data => data);
     },
     // 注册
-    register() {
+    register({ 
+      userName, pwd, email, mobile 
+    }) {
       return request({
         url: '/user/register',
-        method: 'post'
+        method: 'post',
+        data: { 
+          userName, pwd, email, mobile 
+        }
       }).then(data => data);
     },
     // 获取当前用户登记的版权列表

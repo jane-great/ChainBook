@@ -84,23 +84,16 @@ export default {
         visible: false,
         type: 1,
         data: {
-          username: '',
-          pass: '',
-          checkPass: ''
+          userName: 'zebin',
+          pass: '888888',
+          checkPass: '888888',
+          mobile: '18825182349',
+          email: '1069467662@qq.com'
         }
       }
     };
   },
   mounted() {
-    // this.$message({
-    //   message: '恭喜你，这是一条成功消息',
-    //   type: 'success'
-    // });
-    console.log('ready');
-    // this.$api.resource.getResourceDetailById('5b18002108585480f53bce3b').then((data) => {
-    //   console.log(data);
-    // });
-    this.$api.base.getForText().then(() => {});
   },
   methods: {
     handleOpenLoginModal(type) {
@@ -110,7 +103,33 @@ export default {
       });
     },
     handleLoginConfirm() {
-      this.loginModal.visible = false;
+      const { userName, pass, email, mobile } = this.loginModal.data;
+      // 注册
+      if (this.loginModal.type === 1) {
+        this.$api.user.register({
+          userName,
+          pwd: pass,
+          email,
+          mobile
+        }).then(() => {
+          this.$message({
+            message: '注册成功',
+            type: 'success'
+          });
+          this.loginModal.visible = false;
+        });
+      } else {
+        this.$api.user.localLogin({
+          userName,
+          pwd: pass
+        }).then(() => {
+          this.$message({
+            message: '登录成功',
+            type: 'success'
+          });
+          this.loginModal.visible = false;
+        });
+      }
     },
     handleLoginCancel() {
       this.loginModal.visible = false;

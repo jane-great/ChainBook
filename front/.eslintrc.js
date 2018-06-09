@@ -64,8 +64,9 @@ module.exports = {
     }],
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-    'prefer-promise-reject-errors': ["off", {
-      "allowEmptyReject": true
-    }]
+    'prefer-promise-reject-errors': ['off', {
+      'allowEmptyReject': true
+    }],
+    'object-curly-newline': 0
   }
 }

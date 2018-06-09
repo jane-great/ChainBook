@@ -42,11 +42,9 @@ function getRequestInstance() {
 
   // 收到回复后对 response 做处理
   instance.interceptors.response.use((response) => {
-    loadingInstance = Loading.service({
-      fullscreen: true
-    });
+    loadingInstance.close();
 
-    switch (response.data.code) {
+    switch (response.data.status) {
       // 特殊的错误处理
       case -1: // 系统关闭
         if (window.location.hash.substring(3).split('/')[0] !== 'admin') {
@@ -58,11 +56,11 @@ function getRequestInstance() {
         return Promise.reject('登录超时，请刷新页面');
 
       // 正常情况
-      case 0:
+      case 1:
         return Promise.resolve({
-          code: response.data.code,
+          status: response.data.code,
           data: response.data.data,
-          message: response.data.message,
+          msg: response.data.message,
           config: response.config,
           response
         });
@@ -72,17 +70,17 @@ function getRequestInstance() {
         // 抛出完整的 response
         if (response.config.expectRawError) {
           return Promise.reject({
-            code: response.data.code,
-            message: response.data.message,
+            status: response.data.code,
+            msg: response.data.msg,
             response
           });
         }
         // 仅抛出 message
-        return Promise.reject(response.data.message);
+        return Promise.reject(response.data.msg);
     }
   }, (error) => {
     loadingInstance.close();
-    return Promise.reject(`与服务器通信遇到了问题（${error.message}）`);
+    return Promise.reject(`与服务器通信遇到了问题（${error.msg}）`);
   });
 
   return instance;
