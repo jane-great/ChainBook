@@ -1,5 +1,4 @@
 var mongoose = require("mongoose");
-var ObjectId = mongoose.Schema.Types.ObjectId;
 var resourceInfoSchema = new mongoose.Schema({
   resourceName:String,
   desc:String,

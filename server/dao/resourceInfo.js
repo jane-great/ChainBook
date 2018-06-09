@@ -229,5 +229,36 @@ ResourceInfoDao.prototype.deleteTenantableResources = function(id,tokenId){
   }
 }
 
+/**
+ * 登记出售已有的某个资源
+ * @param id
+ * @param tokenId
+ * @param sellStatus 0:不售卖，1：售卖，2：已售卖
+ * @returns {*}
+ */
+ResourceInfoDao.prototype.modifyResourceAddress = function(id,resourceAddress){
+  try{
+    ObjectUtil.notNullAssert(id);
+    ObjectUtil.notNullAssert(resourceAddress);
+    
+    return new Promise((resolve,reject) => {
+      ResourceInfo.update({'_id':id},
+        {$set:{ 'resourceAddress': resourceAddress }},function(err,updateObj){
+          if(err){
+            reject(err);
+          }else{
+            resolve(updateObj);
+          }
+        }
+      )
+    });
+  }catch(err){
+    logger.error("modifySellStatus error.id:{},tokenId:{},sellStatus:{}",id,tokenId,sellStatus,err);
+    return new Promise(reject =>{
+      reject(err);
+    });
+  }
+}
+
 /*初始化*/
 module.exports = new ResourceInfoDao();

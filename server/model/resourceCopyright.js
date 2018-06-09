@@ -8,11 +8,11 @@ var ResourceCopyrightSchema = new mongoose.Schema({
   resourceDHash:String,
   account:String,
   localUrl:String,
-  author:[new mongoose.Schema({
+  authors:[new mongoose.Schema({
     _id: false,
     authorName:String,
-    identityType:Number,
-    identityNum:String
+    identityType:String,
+    identityNum:Number
   })],
   workProperty:String,
   rights:[String],

@@ -11,7 +11,7 @@ SuperDao.prototype.add = function (modelObj) {
       let instance = new this.model(modelObj);
       instance.save(function (err, savedObj) {
         if(err){
-          reject(err);
+          reject(err)
         }else{
           resolve(savedObj);
         }

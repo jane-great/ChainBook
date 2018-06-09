@@ -8,6 +8,9 @@ const objectUtils = require("../utils/objectUtils");
 const localUpload = require("../component/localUpload");
 const config = require("../config");
 
+//已发行
+const PUBLISHED = 1;
+
 /**
  * 发布资源，post方法
  * @param req
@@ -15,22 +18,28 @@ const config = require("../config");
  * @param next
  */
 exports.publishResource = async function(req, res, next) {
+  //TODO 校验表单数据
   let copyrightId = req.body.copyrightId;
   let resourceName = req.body.resourceName;
   let desc = req.body.desc;
   let total = req.body.total;
   let coverImage = req.body.coverImage;
   let price = req.body.price;
-  let user = req.session.passport.user.account;
+  let user = req.session.passport.user;
   let authorAccount = user.account;
   try{
     //1、先校验该版权是否具备发行的资格
-    let copyright = await resourceCopyrightDao.findOne({_id:id,auditStatus:1});
+    let copyright = await resourceCopyrightDao.findOne({_id:copyrightId,auditStatus:1});
     if(!copyright){
       res.send({status:0,msg:"该版权目前不具备发行资格"});
       return;
     }
-    //2、先将发行的数据登记进数据库中
+    //2、验证该版权是否已经发行过
+    if(copyright.publishStatus > 0){
+      res.send({status:0,msg:"该版权已经发行过了"});
+      return;
+    }
+    //2、先将发行的数据登记进数据库中,2,3可以同时进行
     let resourceInfo = {
       resourceName:resourceName,
       desc:desc,
@@ -41,10 +50,13 @@ exports.publishResource = async function(req, res, next) {
       authorAccount:authorAccount,
       hasSellOut:0,
     }
-    await resourceInfoDao.add(resourceInfo);
-    //3、创建资源合约
-    let result = await resourceContractDao.publishResource(user,resourceInfo);
-    //4、登记发行状态、合约地址
+    let saveObj = await resourceInfoDao.add(resourceInfo);
+    //3、创建资源合约 TODO 待对接
+    let resourceAddress = await resourceContractDao.publishResource(user,resourceInfo);
+    //4、登记发行状态、合约地址 ,4在3的后面
+    await resourceInfoDao.modifyResourceAddress(saveObj._id.toString(),resourceAddress);
+    await resourceCopyrightDao.modifyPublishStatus(copyrightId,PUBLISHED,resourceAddress);
+    await userDao.modifyCopyrightInfo(user._id,copyrightId,resourceAddress);
     //5、返回结果
     res.send({status:1,msg:"发行成功"});
   }catch (e) {
@@ -89,8 +101,33 @@ exports.uploadCoverImg = function(req, res, next) {
   });
 }
 
-exports.buyFromAuthor = function(req, res, next){
-
+/**
+ * 先向作者买
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.buyFromAuthor = async function(req, res, next){
+  let resourceId = req.body.resourceId;
+  let user = req.session.passpor.user;
+  try{
+    let resourceInfo = await resourceInfoDao.findSellOutStatusById(id);
+    if(resourceInfo == null || resourceInfo == undefined){
+      res.send({status:0,msg:"该资源不可售"})
+    }
+    //TODO 调用资源合约的向作者购买的方法
+    let tokenId = "test tokenId";
+    //合约购买成功后会回调登记用户的已购买
+    let purchasedResource = userDao.buildEmptyPurchasedResource();
+    purchasedResource.tokenId = tokenId;
+    purchasedResource.resourceName = resourceInfo.resourceName;
+    purchasedResource.resourceId = resourceId;
+    await userDao.addPurchasedResourceByUser(user._id,purchasedResource);
+    //合约
+    
+  }catch (e) {
+  
+  }
 }
 
 /**
@@ -100,8 +137,15 @@ exports.buyFromAuthor = function(req, res, next){
  * @param next
  */
 exports.buy = function (req, res, next) {
+  let user = req.session.passpor.user;
+  let tokenId = req.body.tokenId;
+  let resourceId = req.body.resourceId;
+  //校验表格参数
+  objectUtils.notNullAssert(tokenId);
+  //1.先找到这个资源的地址和这个token的拥有者
+  
   logger.info("buy");
-  //1、先登记发布的资源基本数据
+  
   res.send("buy");
 }
 

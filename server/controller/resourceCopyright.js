@@ -18,33 +18,40 @@ const NO_PUBLISH = 0;
  */
 exports.applyCopyright = async function(req,res,next){
   let user = req.session.passport.user;
-  //todo 校验数据的合法性
   let copyright = {
     workName: req.body.workName,
     workCategory: req.body.workCategory,
     localUrl:req.body.localUrl,
     account:user.account,
-    //TODO 支持多个author
-    author:[{
-      authorName:req.body.authorName,
-      identityType:req.body.identityType,
-      identityNum:req.body.identityNum
-    }],
+    authors:req.body.authors,
     workProperty:req.body.workProperty,
-    right:req.body.right,
+    rights:req.body.rights,
     belong:req.body.belong,
     auditStatus:NO_AUDIT,
     publishStatus:NO_PUBLISH
   }
   
   try{
+    
+    //TODO 需要校验是否重复提交内容
+    //TODO 校验数据的合法性，表单校验
+    objectUtils.isEmptyObject(copyright);
+    objectUtils.isEmptyObject(copyright.authors);
+    objectUtils.isEmptyObject(copyright.rights);
     //先将申请的版权信息登记进数据库
-    await resourceCopyrightDao.add(copyright);
-    res.send({status:1,msg:"save apply success"});
+    let savedObj = await resourceCopyrightDao.add(copyright);
+    //将数据保存至user
+    let copyrightObj = userDao.buildEmptyCopyright();
+    copyrightObj.localUrl = savedObj.localUrl;
+    copyrightObj.copyrightId = savedObj._id;
+    copyrightObj.workName = savedObj.workName;
+    await userDao.addCopyRightByUser(user._id,copyrightObj);
+    logger.info("apply copyright success",copyright);
+    res.send({status:1,msg:"申请版权信息保存成功"});
   }catch (e) {
-    res.send({status:0,msg:"save apply fail"});
+    logger.error("save copyright fail",{ copyright: copyright},e);
+    res.send({status:0,msg:"申请版权信息保存失败"});
   }
-  logger.info("apply copyright",copyright);
 }
 
 /** TODO

@@ -74,14 +74,15 @@ ResourceCopyrightDao.prototype.modifyAuditStatus = function(id,auditStatus){
  * @param publishStatus 0：未发行，1：已发行
  * @returns {*}
  */
-ResourceCopyrightDao.prototype.modifyPublishStatus = function(id,publishStatus){
+ResourceCopyrightDao.prototype.modifyPublishStatus = function(id,publishStatus,resourceAddress){
   try{
     ObjectUtil.notNullAssert(id);
     ObjectUtil.notNullAssert(publishStatus);
+    ObjectUtil.notNullAssert(resourceAddress);
     
     return new Promise((resolve, reject) => {
       ResourceCopyright.update({'_id':id},
-        {$set:{ 'publishStatus': publishStatus }},function(err,updateObj){
+        {$set:{ 'publishStatus': publishStatus,'resourceAddress':resourceAddress }},function(err,updateObj){
           if(err){
             reject(err);
           }else{

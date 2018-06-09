@@ -1,7 +1,7 @@
 const fs = require('fs');
 const config = require('../config');
 const log4js = require('log4js');
-const logger = log4js.getLogger('dao/copyrightContract');
+const logger = log4js.getLogger('dao/resourceContract');
 const Web3 = require('web3');
 let web3;
 if (typeof web3 !== 'undefined') {
@@ -64,12 +64,19 @@ const ResourceContractDao = class dao {
   
   publishResource(userObj,resourceInfoObj){
     //使用transaction方式调用，写入到区块链上,sendTransaction 方式调用
-    return dao._deployContract(userObj,resourceInfoObj).then(contract =>{
+    logger.info("enter resources contract",{
+      userObj:userObj,
+      resourceInfoObj:resourceInfoObj
+    });
+    
+    //返回一个资源合约地址
+    return "resourceAddress_test";
+    /*return dao._deployContract(userObj,resourceInfoObj).then(contract =>{
       //创建合约成功，监听事件，将对应的图书的批量的存入数据，
       //tokenId TODO 初始化创建合约的时候，初始化了一个资源tokenId返回
       let tokenId = "test_tokenId";
       return {resourceAddress:contract.address,tokenIds:[{tokenId}]};
-    });
+    });*/
   }
   
   buyFromAuthor(resourceAddress,buyerAccount){

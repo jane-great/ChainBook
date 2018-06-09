@@ -1,11 +1,12 @@
 var util = require("util");
 var User = require("../model/user.js");
+var Sessions = require("../model/session.js");
 var SuperDao = require("./super.js");
-var crypto = require('crypto');
 var ObjectUtil = require("../utils/objectUtils");
 var log4js = require('log4js');
 var logger = log4js.getLogger('dao/user');
 var encrypt = require('../utils/encrypt');
+
 
 
 var UserDao = function () {
@@ -15,6 +16,18 @@ var UserDao = function () {
 
 util.inherits(UserDao, SuperDao);
 
+UserDao.prototype.deleteSessionById = function (id){
+  return new Promise((resolve,reject) => {
+    //TODO 清除
+    Sessions.deleteOne({_id:id}, function (err) {
+      if(err){
+        reject(err);
+      }
+      resolve(null);
+    });
+  });
+}
+
 UserDao.prototype.verifyUser = function (userName, password) {
   return new Promise((resolve, reject) => {
     User.findOne({userName: userName},{
@@ -22,7 +35,8 @@ UserDao.prototype.verifyUser = function (userName, password) {
       pwd:1,
       email:1,
       mobile:1,
-      randomNum:1
+      randomNum:1,
+      account:1
     },function (err, obj) {
       if (err) {
         reject(err);
@@ -44,6 +58,7 @@ UserDao.prototype.findUserInfoById = function(id){
       userName:1,
       email:1,
       mobile:1,
+      account:1
     },function (err, obj) {
       if (err) {
         reject(err);
@@ -73,13 +88,13 @@ UserDao.prototype.updatePwd = function (userObj, callback) {
  * @param CopyRightObj
  * @returns {*}
  */
-UserDao.prototype.addCopyRightByUser = async function(account,CopyRightObj){
+UserDao.prototype.addCopyRightByUser = async function(id,CopyRightObj){
   try{
-    ObjectUtil.notNullAssert(account);
+    ObjectUtil.notNullAssert(id);
     ObjectUtil.notNullAssert(CopyRightObj);
     
     return new Promise((resolve, reject) => {
-      User.update({account:account},{"$push":{"copyright":CopyRightObj}},function(err,updateObj) {
+      User.update({_id:id},{"$push":{"copyrights":CopyRightObj}},function(err,updateObj) {
         if(err){
           reject(err);
         }else{
@@ -102,13 +117,13 @@ UserDao.prototype.addCopyRightByUser = async function(account,CopyRightObj){
  * @param PurchasedResourceObj
  * @returns {*}
  */
-UserDao.prototype.addPurchasedResourceByUser = function(account,purchasedResourceObj){
+UserDao.prototype.addPurchasedResourceByUser = function(id,purchasedResourceObj){
   try{
-    ObjectUtil.notNullAssert(account);
+    ObjectUtil.notNullAssert(id);
     ObjectUtil.notNullAssert(purchasedResourceObj);
     
     return new Promise((resolve, reject) => {
-      User.update({account:account},{"$push":{"purchasedResources":purchasedResourceObj}},function(err,updateObj){
+      User.update({_id:id},{"$push":{"purchasedResources":purchasedResourceObj}},function(err,updateObj){
         if(err){
           reject(err);
         }else{
@@ -117,7 +132,7 @@ UserDao.prototype.addPurchasedResourceByUser = function(account,purchasedResourc
       });
     });
   }catch(err){
-    logger.error("addPurchasedResourceByUser error,id:{}",id,err);
+    logger.error("addPurchasedResourceByUser error",{id:id},err);
     return new Promise((reject) =>{
       reject(err);
     });
@@ -287,6 +302,77 @@ UserDao.prototype.modifyRentStatus = function(id,tokenId,rentStatus){
       reject(err);
     });
   }
+}
+
+/**
+ * 登记出售已有的某个资源
+ * @param id
+ * @param tokenId
+ * @param sellStatus 0:不售卖，1：售卖，2：已售卖
+ * @returns {*}
+ */
+UserDao.prototype.modifyCopyrightInfo = function(id,copyrightId,resourceAddress){
+  try{
+    ObjectUtil.notNullAssert(id);
+    ObjectUtil.notNullAssert(copyrightId);
+    ObjectUtil.notNullAssert(resourceAddress);
+    
+    return new Promise((resolve,reject) => {
+      User.update({'_id':id,'copyrights.copyrightId':copyrightId},
+        {$set:{ 'copyrights.$.resourceAddress': resourceAddress }},function(err,updateObj){
+          if(err){
+            reject(err);
+          }else{
+            resolve(updateObj);
+          }
+        }
+      )
+    });
+  }catch(err){
+    logger.error("modifyCopyrightInfo error.",{
+      userId:id,
+      copyrightId:copyrightId
+    },err);
+    return new Promise(reject =>{
+      reject(err);
+    });
+  }
+}
+
+UserDao.prototype.buildEmptyCopyright = function(){
+  return {
+    copyrightId:"",
+    workName: "",
+    resourcesIpfsHash:"",
+    resourcesIpfsDHash:"",
+    localUrl:"",
+    copyrightAddress:"",
+    resourceAddress:"",
+  }
+}
+
+
+UserDao.prototype.buildEmptyPurchasedResource = function(){
+  return {
+    resourceId:"",
+    resourceName: "",
+    type:"book",
+    tokenId:"",
+    sellStatus:0,
+    sellPrice:"",
+    rentOutStatus:0,
+    rentPrice:""
+  };
+}
+
+UserDao.prototype.buildEmptyRentResource = function(){
+  return {
+    resourceId:"",
+    tokenId:"",
+    ownerAccount:"",
+    rentPrice:"",
+    rentTime:"",
+  };
 }
 
 module.exports = new UserDao();

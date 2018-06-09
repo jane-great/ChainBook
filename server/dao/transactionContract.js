@@ -1,7 +1,7 @@
 const fs = require('fs');
 const config = require('../config');
 const log4js = require('log4js');
-const logger = log4js.getLogger('dao/copyrightContract');
+const logger = log4js.getLogger('dao/transactionContract');
 const Web3 = require('web3');
 let web3;
 if (typeof web3 !== 'undefined') {
@@ -14,7 +14,7 @@ if (typeof web3 !== 'undefined') {
 //TODO: 参数化
 const BookCopyrightCreate_SOURCE = './smartcontracts/contracts/BookCopyrightCreate.sol';
 
-const CopyrightContractDao = class dao {
+const TransactionContractDao = class dao {
   constructor(){
     fs.readFile(BookCopyrightCreate_SOURCE,function(err, source) {
       //编译合约
@@ -60,23 +60,21 @@ const CopyrightContractDao = class dao {
       });
     });
   }
-  registerCopyright(userObj,copyrightObj){
-    //使用transaction方式调用，写入到区块链上,sendTransaction 方式调用
-    return dao._deployContract(userObj).then(contract =>{
-      //调用其注册版权的方法,todo支持多个
-      //TODO 怎么唤起钱包？？？
-      contract.registerCopyright.sendTransaction(
-        copyrightObj.workName,
-        copyrightObj.author[0].authorName,
-        this.copyrightObj.account,
-        copyrightObj.resourceHash,{
-          from: userObj.account
-        });
-      logger.info("getCopyright 1",contract.getCopyright());
-      //设置注册成功的监听事件
-      return contract.address;
-    });
+  buy(resourceAddress,tokenId,transactionAddress){
+    logger.info("enter buy",
+      {
+        resourceAddress:resourceAddress,
+        tokenId:tokenId,
+        transactionAddress:transactionAddress
+        
+      });
+    if(transactionAddress = null){
+      //需要创建首个交易合约
+      return "transaction_address"
+    }else{
+      return null;
+    }
   }
 }
 
-module.exports = new CopyrightContractDao();
+module.exports = new TransactionContractDao();

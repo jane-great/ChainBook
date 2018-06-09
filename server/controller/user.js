@@ -3,6 +3,7 @@ const log4js = require("log4js");
 const logger = log4js.getLogger("controller/user");
 const encrypt = require('../utils/encrypt');
 const thunder = require("../utils/thunder");
+const transactionContract = require("../dao/transactionContract");
 
 //预出售的状态
 const preSellStatus = 1;
@@ -24,19 +25,22 @@ exports.login = function(req, res, next) {
  * @param res
  * @param next
  */
-exports.logout = function(req, res, next) {
+exports.logout = async function(req, res, next) {
   let user = req.session.passport.user;
   if (user) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("local logout", "enter local logout", { "user": user });
+    logger.info("enter local logout", { "user": user });
+    try{
+      await userDao.deleteSessionById(req.session.id);
+      req.logout();
+      logger.info("success to logout from local", { "username": user.userName });
+      res.send({status:1,msg:"local logout success"});
+    }catch (e) {
+      logger.error("local logout fail",{ "username": user.userName },e);
+      res.send({status:0,msg:"local logout failed"});
     }
-    //TODO 从mongodb中删除session
-    //delMongodb(session.passport.user);
-    req.logout();
-    logger.info("local logout", "success to logout from local", { "username": user.userName });
-    res.send({status:1,msg:"success"});
+    
   } else {
-    logger.warn("authentication error", "local logout failed,no user in req.session.passport object ,maybe already expired.", {
+    logger.warn("local logout failed,no user in req.session.passport object ,maybe already expired.", {
       "session": req.session.id,
       "user": user
     });
@@ -60,14 +64,15 @@ exports.register = async function(req, res, next) {
     pwd:encrypt.getMD5(req.body.pwd,random),
     email:req.body.email,
     mobile:req.body.mobile,
-    randomNum:random
+    randomNum:random,
+    account:"0x7cF2baAe306B1B0476843De3909097be0E6850f3"
   }
   
   //TODO 校验注册的基本内容
   try{
     //1、先向迅雷注册账号 TODO 测试
-    let registerData = await thunder.register(user.email);
-    user.account = registerData.service_id;
+    /*let registerData = await thunder.register(user.email);
+    user.account = registerData.service_id;*/
     //2、保存账号信息至数据库
     await userDao.add(user);
     res.send({status:1,msg:"恭喜注册成功"});
@@ -140,19 +145,20 @@ exports.getCopyRightsByUser = async function(req, res, next) {
  * @param next
  */
 exports.sell = async function(req, res, next) {
-  let tokenId = req.param("tokenId");
+  let tokenId = req.body.tokenId;
+  let user = req.session.passport.user;
   logger.info("selling file.", {
     tokenId: tokenId
   });
   
   try {
-    //1、先拿到当前用户信息，判断用户是否是登录状态,获取当前用户的account
+    //todo 校验
     
-    //2、先判断拿到tokenId和合约地址,已经个人账户，创建交易合约，让资源处于售卖状态
-    
+    //2、先判断拿到tokenId和合约地址,是否属于当前用个人账户，并且判断是否属于二手交易的首次交易，如果是则创建交易合约，如果不是就获取合约，将交易合约处于挂起状态，让资源处于售卖状态
+    let tractionAddress = transactionContract.buy()
     //3、合约创建部署成功触发事件，更新登记合约的地址，还有售卖状态至1
-    let updateObj = await userDao.modifySellStatus("5b0e778305373eafe9ceed5f", tokenId, preSellStatus);
-    if (updateObj !== undefined) {
+    let updateObj = await userDao.modifySellStatus(user._id, tokenId, preSellStatus);
+    if (updateObj !== undefined ) {
       res.send({ status: 1, msg: "the resource sell success." });
     } else {
       res.send({ status: 0, msg: "资源出售失败，请稍后重试" });
