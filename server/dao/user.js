@@ -162,13 +162,13 @@ UserDao.prototype.findOneUserPurchasedResourceByResourceIdAndTokenId = function 
  * @param rentResourceObj
  * @returns {*}
  */
-UserDao.prototype.addRentResourceByUser = function(account,rentResourceObj){
+UserDao.prototype.addRentResourceByUser = function(id,rentResourceObj){
   try{
-    ObjectUtil.notNullAssert(account);
+    ObjectUtil.notNullAssert(id);
     ObjectUtil.notNullAssert(rentResourceObj);
     
     return new Promise((resolve, reject) => {
-      User.update({account:account},{"$push":{"rentResources":rentResourceObj}},function(err,updateObj){
+      User.update({_id:id},{"$push":{"rentResources":rentResourceObj}},function(err,updateObj){
         if(err){
           reject(err);
         }else{
@@ -177,7 +177,10 @@ UserDao.prototype.addRentResourceByUser = function(account,rentResourceObj){
       })
     });
   }catch(err){
-    logger.error("addRentResourceByUser error,id:{}",id,err);
+    logger.error("addRentResourceByUser error",{
+      id:id,
+      rentResourceObj:rentResourceObj
+    },err);
     return new Promise((reject) =>{
       reject(err);
     });
@@ -259,13 +262,44 @@ UserDao.prototype.getRentResourcesByUserId = function(id){
   }
 }
 
+
+
 /**
- * 登记出售已有的某个资源
+ * 登记期望租赁的某个资源
  * @param id
  * @param tokenId
- * @param sellStatus 0:不售卖，1：售卖，2：已售卖
+ * @param rentStatus 0:不出租，1：出租，2：已出租
  * @returns {*}
  */
+UserDao.prototype.modifySellStatus = function(id,tokenId,sellStatus){
+  try{
+    ObjectUtil.notNullAssert(id);
+    ObjectUtil.notNullAssert(tokenId);
+    ObjectUtil.notNullAssert(sellStatus);
+    
+    let setData = {$set:{ 'purchasedResources.$.sellStatus': sellStatus}};
+    return new Promise((resolve,reject) => {
+      User.update({'_id':id,'purchasedResources.tokenId':tokenId},setData,function(err,updateObj){
+          if(err){
+            reject(err);
+          }else{
+            resolve(updateObj);
+          }
+        }
+      )
+    });
+  }catch(err){
+    logger.error("modifyRentStatus error",{
+      id:id,
+      tokenId:tokenId,
+      sellStatus:sellStatus
+    },err);
+    return new Promise(reject =>{
+      reject(err);
+    });
+  }
+}
+
 UserDao.prototype.modifySellStatusAndTransactionAddress = function(id,tokenId,sellStatus,transactionAddress,sellPrice){
   try{
     ObjectUtil.notNullAssert(id);
@@ -289,7 +323,11 @@ UserDao.prototype.modifySellStatusAndTransactionAddress = function(id,tokenId,se
       )
     });
   }catch(err){
-    logger.error("modifySellStatus error.id:{},tokenId:{},sellStatus:{}",id,tokenId,sellStatus,err);
+    logger.error("modifySellStatus error.id:{},tokenId:{},sellStatus:{}",{
+      id:id,
+      tokenId:tokenId,
+      sellStatus:sellStatus
+    },err);
     return new Promise(reject =>{
       reject(err);
     });
@@ -303,20 +341,13 @@ UserDao.prototype.modifySellStatusAndTransactionAddress = function(id,tokenId,se
  * @param rentStatus 0:不出租，1：出租，2：已出租
  * @returns {*}
  */
-UserDao.prototype.modifyRentStatusAndTransactionAddress = function(id,tokenId,rentStatus,rentPrice,transactionAddress){
+UserDao.prototype.modifyRentStatus = function(id,tokenId,rentStatus){
   try{
     ObjectUtil.notNullAssert(id);
     ObjectUtil.notNullAssert(tokenId);
     ObjectUtil.notNullAssert(rentStatus);
-    ObjectUtil.notNullAssert(rentPrice);
     
-    let setData = {$set:{ 'purchasedResources.$.rentOutStatus': rentStatus, "purchasedResources.$.rentPrice":rentPrice}};
-    if(transactionAddress != undefined && transactionAddress != null){
-      setData = {$set:{ 'purchasedResources.$.rentOutStatus': rentStatus,
-          "purchasedResources.$.rentPrice":rentPrice,
-          'purchasedResources.$.transactionAddress':transactionAddress}};
-    }
-  
+    let setData = {$set:{ 'purchasedResources.$.rentOutStatus': rentStatus}};
     return new Promise((resolve,reject) => {
       User.update({'_id':id,'purchasedResources.tokenId':tokenId},setData,function(err,updateObj){
           if(err){
@@ -338,6 +369,50 @@ UserDao.prototype.modifyRentStatusAndTransactionAddress = function(id,tokenId,re
     });
   }
 }
+
+/**
+ * 登记期望出租的某个资源
+ * @param id
+ * @param tokenId
+ * @param rentStatus 0:不出租，1：出租，2：已出租
+ * @returns {*}
+ */
+UserDao.prototype.modifyRentStatusAndTransactionAddress = function(id,tokenId,rentStatus,rentPrice,transactionAddress){
+  try{
+    ObjectUtil.notNullAssert(id);
+    ObjectUtil.notNullAssert(tokenId);
+    ObjectUtil.notNullAssert(rentStatus);
+    ObjectUtil.notNullAssert(rentPrice);
+    
+    let setData = {$set:{ 'purchasedResources.$.rentOutStatus': rentStatus, "purchasedResources.$.rentPrice":rentPrice}};
+    if(transactionAddress != undefined && transactionAddress != null){
+      setData = {$set:{ 'purchasedResources.$.rentOutStatus': rentStatus,
+          "purchasedResources.$.rentPrice":rentPrice,
+          'purchasedResources.$.transactionAddress':transactionAddress}};
+    }
+    
+    return new Promise((resolve,reject) => {
+      User.update({'_id':id,'purchasedResources.tokenId':tokenId},setData,function(err,updateObj){
+          if(err){
+            reject(err);
+          }else{
+            resolve(updateObj);
+          }
+        }
+      )
+    });
+  }catch(err){
+    logger.error("modifyRentStatus error",{
+      id:id,
+      tokenId:tokenId,
+      rentStatus:rentStatus
+    },err);
+    return new Promise(reject =>{
+      reject(err);
+    });
+  }
+}
+
 
 /**
  * 登记出售已有的某个资源
@@ -404,7 +479,7 @@ UserDao.prototype.buildEmptyRentResource = function(){
   return {
     resourceId:"",
     tokenId:"",
-    ownerAccount:"",
+    type:"book",
     rentPrice:"",
     rentTime:"",
   };

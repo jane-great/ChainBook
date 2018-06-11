@@ -12,6 +12,7 @@ var resourceInfoSchema = new mongoose.Schema({
   sellResources:[ new mongoose.Schema({
     _id: false,
     tokenId:String,
+    ownerId:String,
     ownerAccount:String,
     sellPrice:String,
     transactionAddress:String,
@@ -19,6 +20,7 @@ var resourceInfoSchema = new mongoose.Schema({
   tenantableResources:[new mongoose.Schema({
     _id: false,
     tokenId:String,
+    ownerId:String,
     ownerAccount:String,
     rentPrice:String,
     rentTime:Number,

@@ -181,7 +181,7 @@ ResourceInfoDao.prototype.findTenantableResources = function(page){
 ResourceInfoDao.prototype.deletePurchasedResource = function(id,tokenId){
   try{
     return new Promise((resolve, reject) => {
-      ResourceInfo.update({_id,id},{'$pull':{"sellResources":{"tokenId":tokenId}}},function(err,list) {
+      ResourceInfo.update({_id:id},{'$pull':{"sellResources":{"tokenId":tokenId}}},function(err,list) {
         if(err){
           reject(err);
         } else {
@@ -206,10 +206,10 @@ ResourceInfoDao.prototype.deletePurchasedResource = function(id,tokenId){
  * @param tokenId
  * @returns {Promise<any>}
  */
-ResourceInfoDao.prototype.deleteTenantableResources = function(id,tokenId){
+ResourceInfoDao.prototype.deleteTenantableResource = function(id,tokenId){
   try{
     return new Promise((resolve, reject) => {
-      ResourceInfo.update({_id,id},{'$pull':{"tenantableResources":{"tokenId":tokenId}}},function(err,list) {
+      ResourceInfo.update({_id:id},{'$pull':{"tenantableResources":{"tokenId":tokenId}}},function(err,list) {
         if(err){
           reject(err);
         } else {
@@ -218,7 +218,7 @@ ResourceInfoDao.prototype.deleteTenantableResources = function(id,tokenId){
       });
     });
   }catch(err){
-    logger.error("deleteTenantableResources error.",{
+    logger.error("deleteTenantableResource error.",{
       id:id,
       tokenId:tokenId
     },err);
@@ -310,6 +310,55 @@ ResourceInfoDao.prototype.addRentOutResourceById= function(id,rentOutResourceObj
   }
 }
 
+/**
+ * 查询售卖图书owner信息
+ * @returns {Promise<any>}
+ */
+ResourceInfoDao.prototype.findSellResourceOwner = function(id,tokenId){
+  try{
+    return new Promise((resolve, reject) => {
+      ResourceInfo.find({_id:id,"sellResources.tokenId":tokenId},{"resourceName":1,"sellResources.$":1},function(err,list) {
+        if(err){
+          reject(err);
+        } else {
+          resolve(list);
+        }
+      });
+    });
+  }catch(err){
+    logger.error("findSellResourceOwner error.",{
+      id:id
+    },err);
+    return new Promise(reject => {
+      reject(err);
+    });
+  }
+}
+
+/**
+ * 查询出租图书owner信息
+ * @returns {Promise<any>}
+ */
+ResourceInfoDao.prototype.findTenantableResourceOwner = function(id,tokenId){
+  try{
+    return new Promise((resolve, reject) => {
+      ResourceInfo.find({_id:id,"tenantableResources.tokenId":tokenId},{"resourceName":1,"tenantableResources.$":1},function(err,list) {
+        if(err){
+          reject(err);
+        } else {
+          resolve(list);
+        }
+      });
+    });
+  }catch(err){
+    logger.error("findTenantableResourcesOwner error.",{
+      id:id
+    },err);
+    return new Promise(reject => {
+      reject(err);
+    });
+  }
+}
 
 /*初始化*/
 module.exports = new ResourceInfoDao();
