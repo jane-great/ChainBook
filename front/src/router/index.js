@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Index from 'src/views/index/Index';
-// import Login from 'src/views/login/Login';
-// import Register from 'src/views/login/Register';
-import SecondHand from 'src/views/secondHand/SecondHand';
-import User from 'src/views/user/User';
+
+import Index from 'src/views/Index';
+import SecondHand from 'src/views/SecondHand';
+import Rent from 'src/views/Rent';
+import FirstResource from 'src/views/FirstResource';
+import User from 'src/views/User';
 
 Vue.use(Router);
 
@@ -24,16 +25,16 @@ export default new Router({
       path: '/User',
       name: 'User',
       component: User
+    },
+    {
+      path: '/FirstResource',
+      name: FirstResource,
+      component: FirstResource
+    },
+    {
+      path: '/Rent',
+      name: Rent,
+      component: Rent
     }
-    // {
-    //   path: '/Login',
-    //   name: 'Login',
-    //   component: Login
-    // },
-    // {
-    //   path: '/Register',
-    //   name: 'Register',
-    //   component: Register
-    // }
   ]
 });

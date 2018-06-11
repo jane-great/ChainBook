@@ -52,7 +52,7 @@ export default {
       if (value === '') {
         callback(new Error('请输入密码'));
       } else {
-        if (this.data.checkPass !== '') {
+        if (this.data.checkPass !== '' && this.type === 1) {
           this.$refs.form.validateField('checkPass');
         }
         callback();

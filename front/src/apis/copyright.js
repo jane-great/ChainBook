@@ -26,6 +26,14 @@ export default function (request) {
         method: 'post',
         data: file
       }).then(data => data);
+    },
+    // 发行审核通过的版权信息
+    publish(data) {
+      return request({
+        url: '/resource/publish',
+        method: 'post',
+        data
+      }).then(data => data);
     }
   };
 }

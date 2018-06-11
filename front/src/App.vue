@@ -8,16 +8,20 @@
         <span class="logo-font">链书吧</span>
         <!-- <div class="sign-font">2018迅雷全球区块链应用大赛</div> -->
         <div class="login-info">
-          <!-- <span><router-link to="/Login">登录</router-link></span>
-          <span><router-link to="/Register">注册</router-link></span> -->
-          <span class="text-href" @click="handleOpenLoginModal(2)">登录</span>
-          <span class="text-href" @click="handleOpenLoginModal(1)">注册</span>
+          <span v-show="!username">
+            <span class="text-href" @click="handleOpenLoginModal(2)">登录</span>
+            <span class="text-href" @click="handleOpenLoginModal(1)">注册</span>
+          </span>
+          <span v-show="username">
+            <span>欢迎你，zebin</span>
+            <span class="text-href" @click="handleLogout">注销</span>
+          </span>
         </div>
       </div>
       <nav class="navigation">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal">
           <template v-for="(nav, navIndex) in navList">
-            <el-menu-item :index="nav.index">
+            <el-menu-item :index="navIndex + ''">
               <router-link :to="nav.link">{{ nav.name }}</router-link>
             </el-menu-item>
           </template>
@@ -50,6 +54,7 @@
 
 <script>
 import LoginModal from 'components/login/LoginModal';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'App',
@@ -58,27 +63,21 @@ export default {
   },
   data() {
     return {
-      activeIndex: '1',
       navList: [{
         name: '首页',
         link: '/',
-        index: '1'
       }, {
-        name: '图书购买',
-        link: '/',
-        index: '2'
-      }, {
-        name: '图书租赁',
-        link: '/',
-        index: '3'
+        name: '首发资源',
+        link: '/FirstResource',
       }, {
         name: '二手市场',
         link: '/SecondHand',
-        index: '4'
+      }, {
+        name: '租赁市场',
+        link: '/Rent',
       }, {
         name: '个人管理',
         link: '/User',
-        index: '5'
       }],
       loginModal: {
         visible: false,
@@ -93,9 +92,21 @@ export default {
       }
     };
   },
-  mounted() {
+  computed: {
+    ...mapState({
+      username: ({ base }) => base.username,
+      path: ({ route }) => route.path
+    }),
+    activeIndex() {
+      const matchPath = this.navList.map(nav => nav.link).indexOf(this.path);
+      if (matchPath > -1) return matchPath.toString();
+      return '0';
+    }
   },
   methods: {
+    ...mapActions('base', [
+      'getUsername'
+    ]),
     handleOpenLoginModal(type) {
       Object.assign(this.loginModal, {
         visible: true,
@@ -112,27 +123,29 @@ export default {
           email,
           mobile
         }).then(() => {
-          this.$message({
-            message: '注册成功',
-            type: 'success'
-          });
+          this.$message({ message: '注册成功', type: 'success' });
           this.loginModal.visible = false;
-        });
+          this.getUsername(userName);
+        }).catch(() => {});
       } else {
         this.$api.user.localLogin({
           userName,
           pwd: pass
         }).then(() => {
-          this.$message({
-            message: '登录成功',
-            type: 'success'
-          });
+          this.$message({ message: '登录成功', type: 'success' });
           this.loginModal.visible = false;
-        });
+          this.getUsername(userName);
+        }).catch(() => {});
       }
     },
     handleLoginCancel() {
       this.loginModal.visible = false;
+    },
+    handleLogout() {
+      this.$api.user.localLogout().then(() => {
+        this.$message({ message: '注销成功', type: 'success' });
+        this.getUsername('');
+      }).catch(() => {});
     }
   }
 };
@@ -177,6 +190,9 @@ body {
     .el-menu-item {
       width: 100px;
       text-align: center;
+      a {
+        display: block;
+      }
     }
   }
   .login-info {

@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import plugins from './plugins';
 
 import ui from './modules/ui';
-// import base from './modules/base';
+import base from './modules/base';
 
 import {
   pushLoading,
@@ -17,8 +17,8 @@ const debug = process.env.NODE_ENV !== 'production';
 
 const store = new Vuex.Store({
   modules: {
-    ui
-    // base
+    ui,
+    base
   },
   strict: debug,
   plugins: [plugins]

@@ -20,7 +20,17 @@ export default function (request) {
         }
       }).then(data => data);
     },
-    // 根据id获取当前资源买卖的owners信息
+    // 获取所有可租赁资源列表
+    getTenantableResourceListByPage(page, pageSize, lastId) {
+      return request({
+        url: '/resource/getTenantableResourceListByPage',
+        method: 'post',
+        data: {
+          page, pageSize, lastId
+        }
+      }).then(data => data);
+    },
+    // 根据id获取当前资源二手买卖的owners信息
     getPurchasedResourceOwnerListById(id) {
       return request({
         url: '/resource/getPurchasedResourceOwnerListById',
@@ -28,7 +38,7 @@ export default function (request) {
         data: { id }
       }).then(data => data);
     },
-    // 根据id获取当前资源买卖的owners信息
+    // 根据id获取当前租赁者买卖的owners信息
     getTenantableResourceOwnerListById(id) {
       return request({
         url: '/resource/getTenantableResourceOwnerListById',
@@ -70,7 +80,7 @@ export default function (request) {
         }
       }).then(data => data);
     },
-    // 租赁资源
+    // 租赁
     rent(tokenId) {
       return request({
         url: '/resource/rent',

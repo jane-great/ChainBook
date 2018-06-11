@@ -1,8 +1,8 @@
-import { PageType } from 'src/config/user/enum';
+import { ListType } from 'src/config/user/enum';
 
-export const getTableHeader = (pageType) => {
-  switch (pageType) {
-    case PageType.CopyRight: {
+export const getTableHeader = (listType) => {
+  switch (listType) {
+    case ListType.CopyRight: {
       return [
         { field: 'copyrightId', name: '版权ID' }, 
         { field: 'workName', name: '书名' }, 
@@ -13,36 +13,52 @@ export const getTableHeader = (pageType) => {
         { field: 'localUrl', name: '本地URL', hidden: true }
       ];
     }
-    case PageType.Purchase: {
+    case ListType.Purchase: {
       return [
-        { field: 'resourceId', name: '资源ID' },
-        { field: 'resourceName', name: '名称' },
-        { field: 'type', name: '类型' },
-        { field: 'tokenId', name: 'tokenId' },
-        { field: 'sellStatus', name: '出售状态' },
-        { field: 'sellPrice', name: '出售价格' },
-        { field: 'rentOutStatus', name: '租赁状态' },
-        { field: 'rentPrice', name: '租赁价格' }
+        { field: 'resourceId', name: '资源ID', width: 120 },
+        { field: 'resourceName', name: '名称', width: 120 },
+        { field: 'type', name: '类型', width: 40 },
+        { field: 'tokenId', name: 'tokenId', width: 120 },
+        { field: 'sellStatus', name: '出售状态', width: 60 },
+        { field: 'sellPrice', name: '出售价格', width: 60 },
+        { field: 'rentOutStatus', name: '租赁状态', width: 60 },
+        { field: 'rentPrice', name: '租赁价格', width: 60 }
       ];
     }
-    case PageType.Rent: {
+    case ListType.Rent: {
       return [
-        { field: 'resourceId', name: '资源ID' },
-        { field: 'resourceName', name: '名称' },
-        { field: 'type', name: '类型' },
-        { field: 'tokenId', name: 'tokenId' },
-        { field: 'rentTime', name: '出售时间' }
+        { field: 'resourceId', name: '资源ID', width: 120 },
+        { field: 'resourceName', name: '名称', width: 120 },
+        { field: 'type', name: '类型', width: 40 },
+        { field: 'tokenId', name: 'tokenId', width: 120 },
+        { field: 'rentTime', name: '出售时间', width: 80 }
       ];
     }
     default:
       return [];
   }
 };
-export const getInitData = (pageType) => {
-  switch (pageType) {
-    case PageType.CopyRight:
-    case PageType.Purchase:
-    case PageType.Rent:
+export const getInitData = (listType) => {
+  switch (listType) {
+    case ListType.CopyRight:
+      return {
+        workName: '测试新增版权',
+        workCategory: '',
+        samplePath: [{
+          name: 'test',
+          url: 'local/file/sample-xv20s51528202601031.doc'
+        }],
+        authors: [{
+          authorName: 'zebin',
+          identityType: '身份证',
+          identityNum: '12345678'
+        }],
+        workProperty: '',
+        rights: [],
+        belong: ''        
+      };
+    case ListType.Purchase:
+    case ListType.Rent:
     default:
       return [];
   }
