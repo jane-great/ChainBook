@@ -6103,8 +6103,86 @@
       "links": {},
       "address": "0x50034c2af653ae6cdc7a1f695b81ba6e12f5f95b",
       "transactionHash": "0xb3a052f378170d293bf04fbfdf697cdf8a2ecd49f84835496bb6e4f2d405bfa0"
+    },
+    "1528696182740": {
+      "events": {
+        "0x370f59359a69ca4d9c8d749154cac481fd044a210e93fc5b61857fdfaeb54021": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_bookName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "authorName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "_authorAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_copyrightAddress",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "_timestamp",
+              "type": "uint256"
+            }
+          ],
+          "name": "_RegisterCopyright",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x6a35aaa6646e90ad8d0263ea16bf7cd9f45eb3ba",
+      "transactionHash": "0x937a9d7e149512121c35adac027ffd89ee1f073f181cc660763e98544123703a"
+    },
+    "1528704627293": {
+      "events": {
+        "0x370f59359a69ca4d9c8d749154cac481fd044a210e93fc5b61857fdfaeb54021": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_bookName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "authorName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "_authorAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_copyrightAddress",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "_timestamp",
+              "type": "uint256"
+            }
+          ],
+          "name": "_RegisterCopyright",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x062d6def71170c8304af616805a77bb0b2e10ed2",
+      "transactionHash": "0xa727ad9cade9a93ec2d80556644b99d4bfbae61c8788284af221c6759b4a8d70"
     }
   },
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-06-11T06:03:57.606Z"
+  "updatedAt": "2018-06-11T08:28:03.873Z"
 }

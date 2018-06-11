@@ -1,9 +1,9 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./AccessControl.sol";
-//import "./BuyAndSell.sol";
+import "./BuyAndSell.sol";
 import "./PullPayment.sol";
-//import "./RentAndLease.sol";
+import "./RentAndLease.sol";
 
 
 // 交易合约
@@ -14,7 +14,7 @@ import "./PullPayment.sol";
 // @param  newContract  新合约地址
 contract Transaction is AccessControl, PullPayment {
 
-/*
+
     BuyAndSell public buyAndSell;           // 买卖合约地址
     RentAndLease public rentAndLease;       // 租赁合约地址
     Transaction public newContract;         // 新合约地址
@@ -146,7 +146,6 @@ contract Transaction is AccessControl, PullPayment {
         require(_rentTime == uint128(_rentTime));
         ERC721Expand  nonFungibleContract = ERC721Expand(_contract);
         require(nonFungibleContract.ownerOf(_tokenId) == msg.sender);
-        require(!nonFungibleContract.isLease(_tokenId));
         // nonFungibleContract.transferFrom(msg.sender, this, _tokenId);
         rentAndLease.rent(_contract, _tokenId, _price, _rentTime, msg.sender);
         nonFungibleContract.creatRent(_tokenId);
@@ -201,20 +200,20 @@ contract Transaction is AccessControl, PullPayment {
     function cancelSell(address _contract, uint256 _tokenId) external {
         require(_tokenId == uint32(_tokenId));
         require(buyAndSell.getSeller(_contract, _tokenId) == msg.sender);
-        buyAndSell.cancelSell(_contract, _tokenId, msg.sender);
         ERC721Expand  nonFungibleContract = ERC721Expand(_contract);
+        buyAndSell.cancelSell(_contract, _tokenId, msg.sender);
         nonFungibleContract.sellCancel(_tokenId);
         nonFungibleContract.transfer(msg.sender, _tokenId);
     }
 
     // @dev 取消租赁
-    function cancelRent(address _contract, uint256 _tokenId) external {
-        require(_tokenId == uint32(_tokenId));
-        require(rentAndLease.getRenter(_contract, _tokenId) == msg.sender);
-        ERC721Expand  nonFungibleContract = ERC721Expand(_contract);
-        nonFungibleContract.rentCancel(_tokenId);
-        rentAndLease.cancelRent(_contract, _tokenId, msg.sender);
-    }
+   function cancelRent(address _contract, uint256 _tokenId) external {
+       require(_tokenId == uint32(_tokenId));
+       require(rentAndLease.getRenter(_contract, _tokenId) == msg.sender);
+       ERC721Expand  nonFungibleContract = ERC721Expand(_contract);
+       nonFungibleContract.rentCancel(_tokenId);
+       rentAndLease.cancelRent(_contract, _tokenId, msg.sender);
+   }
 
     // @dev 修改售卖价格
     function setSellPrice(address _contract, uint256 _tokenId, uint256 _price) external {
@@ -272,7 +271,5 @@ contract Transaction is AccessControl, PullPayment {
     function unpauseContract() external onlyCEO whenPaused {
         super.unpause();
     }
-
-*/
 
 }
