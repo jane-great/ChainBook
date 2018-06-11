@@ -181,14 +181,15 @@ exports.sell = async function(req, res, next) {
     
     let resourceInfo = await resourceInfoDao.findById(resourceId);
     //2、先判断拿到tokenId和合约地址,是否属于当前用个人账户，并且判断是否属于二手交易的首次交易，如果是则创建交易合约，如果不是就获取交易合约地址合约，将交易合约处于挂起状态，让资源处于售卖状态
-    let transactionAddress = transactionContract.sell(resourceInfo.resourceAddress,tokenId,sellResource.transactionAddress);
+    let transactionAddressTmp = transactionContract.sell(resourceInfo.resourceAddress,tokenId,sellResource.transactionAddress);
     //3、合约创建部署成功触发事件，更新登记交易合约的地址，还有售卖状态至1
+    let transactionAddress = transactionAddressTmp == null?sellResource.transactionAddress:transactionAddressTmp;
     var sellResourceObj = {
       tokenId:tokenId,
       ownerAccount:user.account,
       ownerId:user._id,
       sellPrice:sellPrice,
-      transactionAddress:sellResource.transactionAddress
+      transactionAddress:transactionAddress
     }
     await resourceInfoDao.addSellResourceById(resourceId,sellResourceObj)
     let updateObj = await userDao.modifySellStatusAndTransactionAddress(user._id, tokenId, preSellStatus,transactionAddress,sellPrice);
@@ -252,7 +253,9 @@ exports.rentOut = async function(req, res, next) {
   
       let resourceInfo = await resourceInfoDao.findById(resourceId);
       //2、先判断拿到tokenId和合约地址,是否属于当前用个人账户，并且判断是否属于二手交易的首次交易，如果是则创建交易合约，如果不是就获取交易合约地址合约，将交易合约处于挂起状态，让资源处于售卖状态
-      let transactionAddress = transactionContract.rentOut(resourceInfo.resourceAddress,tokenId,rentOutResource.transactionAddress);
+      let transactionAddressTmp = transactionContract.rentOut(resourceInfo.resourceAddress,tokenId,rentOutResource.transactionAddress);
+  
+      let transactionAddress = transactionAddressTmp == null?rentOutResource.transactionAddress:transactionAddressTmp;
       //3、合约创建部署成功触发事件，更新登记交易合约的地址，还有售卖状态至1
       var rentOutResourceObj = {
         tokenId:tokenId,
@@ -260,7 +263,7 @@ exports.rentOut = async function(req, res, next) {
         ownerAccount:user.account,
         rentPrice:rentPrice,
         rentTime:rentTime,
-        transactionAddress:rentOutResource.transactionAddress
+        transactionAddress:transactionAddress
       }
       await resourceInfoDao.addRentOutResourceById(resourceId,rentOutResourceObj)
       let updateObj = await userDao.modifyRentStatusAndTransactionAddress(user._id, tokenId, preRentStatus,rentPrice,transactionAddress);
