@@ -186,6 +186,7 @@ exports.sell = async function(req, res, next) {
     var sellResourceObj = {
       tokenId:tokenId,
       ownerAccount:user.account,
+      ownerId:user._id,
       sellPrice:sellPrice,
       transactionAddress:sellResource.transactionAddress
     }
@@ -255,6 +256,7 @@ exports.rentOut = async function(req, res, next) {
       //3、合约创建部署成功触发事件，更新登记交易合约的地址，还有售卖状态至1
       var rentOutResourceObj = {
         tokenId:tokenId,
+        ownerId:user._id,
         ownerAccount:user.account,
         rentPrice:rentPrice,
         rentTime:rentTime,

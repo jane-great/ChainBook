@@ -92,6 +92,28 @@ const TransactionContractDao = class dao {
       return null;
     }
   }
+  
+  buy(tokenId,transactionAddress,userAccount,ownerAccount){
+    logger.info("enter buy",
+      {
+        tokenId:tokenId,
+        transactionAddress:transactionAddress,
+        userAccount:userAccount,
+        ownerAccount:ownerAccount
+      });
+    return true;
+  }
+  
+  rent(tokenId,transactionAddress,userAccount,ownerAccount){
+    logger.info("enter rent",
+      {
+        tokenId:tokenId,
+        transactionAddress:transactionAddress,
+        userAccount:userAccount,
+        ownerAccount:ownerAccount
+      });
+    return true;
+  }
 }
 
 module.exports = new TransactionContractDao();

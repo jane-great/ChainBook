@@ -4,6 +4,7 @@ var userDao = require("../dao/user");
 var resourceInfoDao = require("../dao/resourceInfo");
 var resourceCopyrightDao = require("../dao/resourceCopyright");
 var resourceContractDao = require("../dao/resourceContract");
+const transactionContractDao = require("../dao/transactionContract");
 const objectUtils = require("../utils/objectUtils");
 const localUpload = require("../component/localUpload");
 const config = require("../config");
@@ -145,17 +146,60 @@ exports.buyFromAuthor = async function(req, res, next){
  * @param res
  * @param next
  */
-exports.buy = function (req, res, next) {
-  let user = req.session.passpor.user;
+exports.buy = async function (req, res, next) {
+  let user = req.session.passport.user;
   let tokenId = req.body.tokenId;
   let resourceId = req.body.resourceId;
-  //校验表格参数
-  objectUtils.notNullAssert(tokenId);
-  //1.先找到这个资源的地址和这个token的拥有者
+  let userAccount = user.account;
+  logger.info("enter buy",{
+    user:user,
+    tokenId:tokenId,
+    resourceId:resourceId,
+    userAccount:userAccount
+  });
+  try{
+    //TODO 校验表格参数
+    objectUtils.notNullAssert(tokenId);
+    //1.先找到这个资源的地址和这个token的拥有者
+    //TODO 校验自己不能买自己出售的书
+    let sellResourceDoc = await resourceInfoDao.findSellResourceOwner(resourceId,tokenId);
+    let sellResource = sellResourceDoc[0].sellResources[0];
+    //2.调用交易合约的购买方法，合约里转移所有权
+    let isSuccess = transactionContractDao.buy(tokenId,sellResource.transactionAddress,userAccount,sellResource.ownerAccount);
+    if(!isSuccess){
+      logger.warn("enter buy",{
+        user:user,
+        tokenId:tokenId,
+        resourceId:resourceId,
+        userAccount:userAccount
+      });
+      res.send({status:0,msg:"购买二手资源失败"});
+      return;
+    }
+    //TODO 事务
+    //3、成功后回调删除资源中正在sell的tokenId记录
+    await resourceInfoDao.deletePurchasedResource(resourceId,tokenId);
+    //4、成功后回调添加当前用户的购买记录
+    let purchasedResource = userDao.buildEmptyPurchasedResource();
+    purchasedResource.tokenId = tokenId;
+    purchasedResource.resourceName = sellResourceDoc[0].resourceName;
+    purchasedResource.resourceId = resourceId;
+    purchasedResource.transactionAddress = sellResource.transactionAddress;
+    await userDao.addPurchasedResourceByUser(user._id,purchasedResource);
+    //5、修改原有user的售卖状态
+    await userDao.modifySellStatus(sellResource.ownerId,tokenId,2);
+    
+    res.send({status:1,msg:"购买二手资源成功"});
+  }catch (e) {
+    logger.error("enter buy",{
+      user:user,
+      tokenId:tokenId,
+      resourceId:resourceId,
+      userAccount:userAccount
+    },e);
+    res.send({status:0,msg:"购买二手资源失败"});
+  }
   
-  logger.info("buy");
-  
-  res.send("buy");
 }
 
 /**
@@ -164,10 +208,61 @@ exports.buy = function (req, res, next) {
  * @param res
  * @param next
  */
-exports.rent = function(req, res, next) {
-  logger.info("rent");
-  //1、先登记发布的资源基本数据
-  res.send("rent");
+exports.rent = async function(req, res, next) {
+  let user = req.session.passport.user;
+  let tokenId = req.body.tokenId;
+  let resourceId = req.body.resourceId;
+  let userAccount = user.account;
+  logger.info("enter rent",{
+    user:user,
+    tokenId:tokenId,
+    resourceId:resourceId,
+    userAccount:userAccount
+  });
+  try{
+    //TODO 校验表格参数
+    objectUtils.notNullAssert(tokenId);
+    //1.先找到这个资源的地址和这个token的拥有者
+    //TODO 校验自己不能买自己出售的书
+    let rentResourceDoc = await resourceInfoDao.findTenantableResourceOwner(resourceId,tokenId);
+    let rentResource = rentResourceDoc[0].tenantableResources[0];
+    //2.调用交易合约的购买方法，合约里转移所有权
+    let isSuccess = transactionContractDao.rent(tokenId,rentResource.transactionAddress,userAccount,rentResource.ownerAccount);
+    if(!isSuccess){
+      logger.warn("enter rent",{
+        user:user,
+        tokenId:tokenId,
+        resourceId:resourceId,
+        userAccount:userAccount,
+        rentResourceDoc:rentResourceDoc
+      });
+      res.send({status:0,msg:"租赁资源失败"});
+      return;
+    }
+    //TODO 事务
+    //3、成功后回调删除资源中正在sell的tokenId记录
+    await resourceInfoDao.deleteTenantableResource(resourceId,tokenId);
+    //4、成功后回调添加当前用户的购买记录
+    let rentResourceObj = userDao.buildEmptyRentResource();
+    rentResourceObj.tokenId = tokenId;
+    rentResourceObj.resourceName = rentResourceDoc[0].resourceName;
+    rentResourceObj.resourceId = resourceId;
+    rentResourceObj.rentTime = rentResource.rentTime;
+    rentResourceObj.transactionAddress = rentResource.transactionAddress;
+    await userDao.addRentResourceByUser(user._id,rentResourceObj);
+    //5、修改原有user的售卖状态
+    await userDao.modifyRentStatus(rentResource.ownerId,tokenId,2);
+    
+    res.send({status:1,msg:"租赁资源成功"});
+  }catch (e) {
+    logger.error("enter buy",{
+      user:user,
+      tokenId:tokenId,
+      resourceId:resourceId,
+      userAccount:userAccount
+    },e);
+    res.send({status:0,msg:"租赁资源失败"});
+  }
 }
 
 /**
