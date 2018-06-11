@@ -63,8 +63,9 @@ const CopyrightContractDao = class dao {
     });
   }
   registerCopyright(userObj,copyrightObj){
+    return "copyrightAddress";
     //使用transaction方式调用，写入到区块链上,sendTransaction 方式调用
-    return dao._deployContract(userObj,resourceInfoObj).then(contract =>{
+    /*return dao._deployContract(userObj,resourceInfoObj).then(contract =>{
       //调用其注册版权的方法,todo支持多个
       //TODO 怎么唤起钱包？？？
       contract.registerCopyright.sendTransaction(
@@ -77,7 +78,7 @@ const CopyrightContractDao = class dao {
       logger.info("getCopyright 1",contract.getCopyright());
       //设置注册成功的监听事件
       return contract.address;
-    });
+    });*/
   }
 }
 
