@@ -22,7 +22,7 @@
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal">
           <template v-for="(nav, navIndex) in navList">
             <el-menu-item :index="navIndex + ''">
-              <router-link :to="nav.link">{{ nav.name }}</router-link>
+              <router-link :to="nav.path">{{ nav.title }}</router-link>
             </el-menu-item>
           </template>
         </el-menu>
@@ -55,6 +55,7 @@
 <script>
 import LoginModal from 'components/login/LoginModal';
 import { mapState, mapActions } from 'vuex';
+import { routerMap } from 'src/router';
 
 export default {
   name: 'App',
@@ -63,22 +64,7 @@ export default {
   },
   data() {
     return {
-      navList: [{
-        name: '首页',
-        link: '/',
-      }, {
-        name: '首发资源',
-        link: '/FirstResource',
-      }, {
-        name: '二手市场',
-        link: '/SecondHand',
-      }, {
-        name: '租赁市场',
-        link: '/Rent',
-      }, {
-        name: '个人管理',
-        link: '/User',
-      }],
+      navList: routerMap,
       loginModal: {
         visible: false,
         type: 1,
@@ -98,7 +84,7 @@ export default {
       path: ({ route }) => route.path
     }),
     activeIndex() {
-      const matchPath = this.navList.map(nav => nav.link).indexOf(this.path);
+      const matchPath = this.navList.map(nav => nav.path).indexOf(this.path);
       if (matchPath > -1) return matchPath.toString();
       return '0';
     }

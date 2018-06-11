@@ -9,32 +9,52 @@ import User from 'src/views/User';
 
 Vue.use(Router);
 
-export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'Index',
-      component: Index
-    },
-    {
-      path: '/SecondHand',
-      name: 'SecondHand',
-      component: SecondHand
-    },
-    {
-      path: '/User',
-      name: 'User',
-      component: User
-    },
-    {
-      path: '/FirstResource',
-      name: FirstResource,
-      component: FirstResource
-    },
-    {
-      path: '/Rent',
-      name: Rent,
-      component: Rent
-    }
-  ]
+export const routerMap = [
+  {
+    path: '/',
+    name: 'Index',
+    component: Index,
+    title: '首页'
+  },
+  {
+    path: '/FirstResource',
+    name: FirstResource,
+    component: FirstResource,
+    title: '首发资源'
+  },
+  {
+    path: '/SecondHand',
+    name: 'SecondHand',
+    component: SecondHand,
+    title: '二手市场'
+  },
+  {
+    path: '/Rent',
+    name: Rent,
+    component: Rent,
+    title: '租赁市场'
+  },
+  {
+    path: '/User',
+    name: 'User',
+    component: User,
+    title: '个人管理'
+  }
+];
+
+const router =  new Router({
+  routes: routerMap
 });
+
+router.beforeEach((to, from, next) => {
+  const matchPath = routerMap.filter(item => item.path === to.path);
+  if (matchPath) {
+    document.title = `链书吧-${matchPath[0].title}`;
+  } else {
+    window.alert('不存在路径');
+  }
+  
+  next();
+});
+
+export default router;
