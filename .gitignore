@@ -3,4 +3,5 @@ node_modules
 .idea
 .git
 *.log.*
-
+local/
+ecosystem.config.js
