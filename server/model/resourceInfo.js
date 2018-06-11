@@ -9,11 +9,12 @@ var resourceInfoSchema = new mongoose.Schema({
   resourceAddress: String,
   authorAccount:String,
   hasSellOut:Number,
-  purchasedResources:[ new mongoose.Schema({
+  sellResources:[ new mongoose.Schema({
     _id: false,
     tokenId:String,
     ownerAccount:String,
-    purchasePrice:String
+    sellPrice:String,
+    transactionAddress:String,
   })],
   tenantableResources:[new mongoose.Schema({
     _id: false,
@@ -21,6 +22,7 @@ var resourceInfoSchema = new mongoose.Schema({
     ownerAccount:String,
     rentPrice:String,
     rentTime:Number,
+    transactionAddress:String
   })],
   createDate: {type: Date, default: Date.now},
   createBy: String,

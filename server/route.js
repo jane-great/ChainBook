@@ -29,8 +29,8 @@ router.get(URL+"/user/renderUser",auth.isAuthenticated, user.getCurrentUserInfo)
 router.get(URL+"/user/getCopyRightsByUser",auth.isAuthenticated,user.getCopyRightsByUser);
 router.get(URL+"/user/getPurchasedResourcesByUser",auth.isAuthenticated,user.getPurchasedResourcesByUser);
 router.get(URL+"/user/getRentResourcesByUser",auth.isAuthenticated,user.getRentResourcesByUser);
-router.get(URL+"/user/purchasedResources/sell",auth.isAuthenticated,user.sell);
-router.get(URL+"/user/purchasedResource/rentOut",auth.isAuthenticated,user.rentOut);
+router.post(URL+"/user/purchasedResources/sell",auth.isAuthenticated,user.sell);
+router.post(URL+"/user/purchasedResource/rentOut",auth.isAuthenticated,user.rentOut);
 
 //版权
 router.post(URL+"/copyright/apply",auth.isAuthenticated,resourceCopyright.applyCopyright);
@@ -52,6 +52,7 @@ router.post(URL+"/resource/getPurchasedResourceListByPage",resourceInfo.getPurch
 router.post(URL+"/resource/getTenantableResourceListByPage",resourceInfo.getTenantableResourceListByPage);
 router.get(URL+"/resource/getPurchasedResourceOwnerListById",resourceInfo.getPurchasedResourceOwnerListById);
 router.get(URL+"/resource/getTenantableResourceOwnerListById",resourceInfo.getTenantableResourceOwnerListById);
+router.post(URL+"/resource/buyFromAuthor",auth.isAuthenticated,resourceInfo.buyFromAuthor);
 router.post(URL+"/resource/buy",auth.isAuthenticated,resourceInfo.buy);
 router.post(URL+"/resource/rent",auth.isAuthenticated,resourceInfo.rent);
 module.exports = router;

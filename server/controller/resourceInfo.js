@@ -109,13 +109,19 @@ exports.uploadCoverImg = function(req, res, next) {
  */
 exports.buyFromAuthor = async function(req, res, next){
   let resourceId = req.body.resourceId;
-  let user = req.session.passpor.user;
+  let user = req.session.passport.user;
+  logger.info("enter buyFromAuthor",{
+    resourceId:resourceId,
+    user:user
+  });
   try{
-    let resourceInfo = await resourceInfoDao.findSellOutStatusById(id);
+    let resourceInfo = await resourceInfoDao.findSellOutStatusById(resourceId);
     if(resourceInfo == null || resourceInfo == undefined){
-      res.send({status:0,msg:"该资源不可售"})
+      res.send({status:0,msg:"该资源已不可售"});
     }
+    //需要时考虑一下事务
     //TODO 调用资源合约的向作者购买的方法
+    //TODO 转账
     let tokenId = "test tokenId";
     //合约购买成功后会回调登记用户的已购买
     let purchasedResource = userDao.buildEmptyPurchasedResource();
@@ -123,10 +129,13 @@ exports.buyFromAuthor = async function(req, res, next){
     purchasedResource.resourceName = resourceInfo.resourceName;
     purchasedResource.resourceId = resourceId;
     await userDao.addPurchasedResourceByUser(user._id,purchasedResource);
-    //合约
-    
+    res.send({status:1,msg:"购买成功"})
   }catch (e) {
-  
+    logger.error("enter buyFromAuthor",{
+      resourceId:resourceId,
+      user:user
+    },e);
+    res.send({status:1,msg:"购买失败"});
   }
 }
 
@@ -216,7 +225,7 @@ exports.getPurchasedResourceListByPage = async function(req, res, next) {
   try{
     page = validatePage(page);
     let resourceInfoList = await resourceInfoDao.findPurchasedResources(page);
-    let total = await resourceInfoDao.count({purchasedResources:{$elemMatch:{$ne:null}}});
+    let total = await resourceInfoDao.count({sellResources:{$elemMatch:{$ne:null}}});
     if(resourceInfoList !== undefined && resourceInfoList.length > 0 ){
       page.lastId = resourceInfoList[resourceInfoList.length -1]._id;
     }

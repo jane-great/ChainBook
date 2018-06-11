@@ -1,6 +1,5 @@
 var util = require("util");
 var ResourceInfo = require("../model/resourceInfo.js");
-var ObjectId = require("../model/resourceInfo").ObjectId;
 var SuperDao = require("./super.js");
 var ObjectUtil = require("../utils/objectUtils");
 var log4js = require('log4js');
@@ -24,7 +23,7 @@ ResourceInfoDao.prototype.findSellOutStatusById = function(id) {
     ObjectUtil.notNullAssert(id);
     
     return new Promise((resolve, reject) => {
-      ResourceInfo.find({_id:id,hasSellOut:0},{purchasedResources:0,tenantableResources:0},function(err,obj) {
+      ResourceInfo.findOne({_id:id,hasSellOut:0},{sellResources:0,tenantableResources:0},function(err,obj) {
         if (err){
           reject(err);
         } else {
@@ -51,7 +50,7 @@ ResourceInfoDao.prototype.findAllResource = function(page){
       if(page.lastId != undefined && page.lastId != 0 && "" != page.lastId){
         option = {'_id' :{ "$gt" : page.lastId},hasSellOut:0}
       }
-      ResourceInfo.find(option,{purchasedResources:0,tenantableResources:0},function(err,list) {
+      ResourceInfo.find(option,{sellResources:0,tenantableResources:0},function(err,list) {
         if(err){
           reject(err);
         } else {
@@ -74,11 +73,11 @@ ResourceInfoDao.prototype.findAllResource = function(page){
 ResourceInfoDao.prototype.findPurchasedResources = function(page){
   try{
     return new Promise((resolve, reject) => {
-      let option = {purchasedResources:{$elemMatch:{$ne:null}}};
+      let option = {sellResources:{$elemMatch:{$ne:null}}};
       if(page.lastId != undefined && page.lastId != 0 && "" != page.lastId){
-        option = {'_id' :{ "$gt" : page.lastId},purchasedResources:{$elemMatch:{$ne:null}}};
+        option = {'_id' :{ "$gt" : page.lastId},sellResources:{$elemMatch:{$ne:null}}};
       }
-      ResourceInfo.find(option,{purchasedResources:0,tenantableResources:0},function(err,list) {
+      ResourceInfo.find(option,{sellResources:0,tenantableResources:0},function(err,list) {
         if(err){
           reject(err);
         } else {
@@ -103,7 +102,7 @@ ResourceInfoDao.prototype.findPurchasedResources = function(page){
 ResourceInfoDao.prototype.findPurchasedResourceOwners = function(id){
   try{
     return new Promise((resolve, reject) => {
-      ResourceInfo.find({_id:id,purchasedResources:{$elemMatch:{$ne:null}}},{purchasedResources:1},function(err,list) {
+      ResourceInfo.find({_id:id,sellResources:{$elemMatch:{$ne:null}}},{sellResources:1},function(err,list) {
         if(err){
           reject(err);
         } else {
@@ -157,7 +156,7 @@ ResourceInfoDao.prototype.findTenantableResources = function(page){
       if(page.lastId != undefined && page.lastId != 0 && "" != page.lastId){
         option = {'_id' :{ "$gt" : page.lastId},tenantableResources:{$elemMatch:{$ne:null}}};
       }
-      ResourceInfo.find(option,{purchasedResources:0,tenantableResources:0},function(err,list) {
+      ResourceInfo.find(option,{sellResources:0,tenantableResources:0},function(err,list) {
         if(err){
           reject(err);
         } else {
@@ -182,7 +181,7 @@ ResourceInfoDao.prototype.findTenantableResources = function(page){
 ResourceInfoDao.prototype.deletePurchasedResource = function(id,tokenId){
   try{
     return new Promise((resolve, reject) => {
-      ResourceInfo.update({_id,id},{'$pull':{"purchasedResources":{"tokenId":tokenId}}},function(err,list) {
+      ResourceInfo.update({_id,id},{'$pull':{"sellResources":{"tokenId":tokenId}}},function(err,list) {
         if(err){
           reject(err);
         } else {
@@ -230,7 +229,7 @@ ResourceInfoDao.prototype.deleteTenantableResources = function(id,tokenId){
 }
 
 /**
- * 登记出售已有的某个资源
+ * 登记某个资源发布合约后的地址
  * @param id
  * @param tokenId
  * @param sellStatus 0:不售卖，1：售卖，2：已售卖
@@ -259,6 +258,58 @@ ResourceInfoDao.prototype.modifyResourceAddress = function(id,resourceAddress){
     });
   }
 }
+
+/**
+ * 添加一条用户确认记录
+ * @param account
+ * @param rentResourceObj
+ * @returns {*}
+ */
+ResourceInfoDao.prototype.addSellResourceById= function(id,sellResourceObj){
+  try{
+    ObjectUtil.notNullAssert(id);
+    ObjectUtil.notNullAssert(sellResourceObj);
+    
+    return new Promise((resolve, reject) => {
+      ResourceInfo.update({_id:id},{"$push":{"sellResources":sellResourceObj}},function(err,updateObj){
+        if(err){
+          reject(err);
+        }else{
+          resolve(updateObj);
+        }
+      });
+    });
+  }catch(err){
+    logger.error("addSellResourceById error",id,err);
+    return new Promise((reject) =>{
+      reject(err);
+    });
+  }
+}
+
+
+ResourceInfoDao.prototype.addRentOutResourceById= function(id,rentOutResourceObj){
+  try{
+    ObjectUtil.notNullAssert(id);
+    ObjectUtil.notNullAssert(rentOutResourceObj);
+    
+    return new Promise((resolve, reject) => {
+      ResourceInfo.update({_id:id},{"$push":{"tenantableResources":rentOutResourceObj}},function(err,updateObj){
+        if(err){
+          reject(err);
+        }else{
+          resolve(updateObj);
+        }
+      });
+    });
+  }catch(err){
+    logger.error("addSellResourceById error",id,err);
+    return new Promise((reject) =>{
+      reject(err);
+    });
+  }
+}
+
 
 /*初始化*/
 module.exports = new ResourceInfoDao();

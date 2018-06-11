@@ -20,6 +20,7 @@ var userSchema = new mongoose.Schema({
     _id: false,
     resourceId:String,
     resourceName: String,
+    transactionAddress:String,
     type:String,
     tokenId:String,
     sellStatus:Number,
@@ -31,6 +32,7 @@ var userSchema = new mongoose.Schema({
     _id: false,
     resourceId:String,
     resourceName:String,
+    transactionAddress:String,
     type:String,
     tokenId:String,
     rentTime:Number

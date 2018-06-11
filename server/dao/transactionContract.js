@@ -60,7 +60,7 @@ const TransactionContractDao = class dao {
       });
     });
   }
-  buy(resourceAddress,tokenId,transactionAddress){
+  sell(resourceAddress,tokenId,transactionAddress){
     logger.info("enter buy",
       {
         resourceAddress:resourceAddress,
@@ -68,9 +68,26 @@ const TransactionContractDao = class dao {
         transactionAddress:transactionAddress
         
       });
-    if(transactionAddress = null){
+    if(transactionAddress == null || transactionAddress == undefined){
       //需要创建首个交易合约
-      return "transaction_address"
+      return "transaction_address";
+    }else{
+      return null;
+    }
+  }
+  
+  rentOut(resourceAddress,tokenId,transactionAddress,rentPrice,rentTime){
+    logger.info("enter rentOut",
+      {
+        resourceAddress:resourceAddress,
+        tokenId:tokenId,
+        transactionAddress:transactionAddress,
+        rentPrice:rentPrice,
+        rentTime:rentTime
+      });
+    if(transactionAddress == null || transactionAddress == undefined){
+      //需要创建首个交易合约
+      return "transaction_address_rent";
     }else{
       return null;
     }
