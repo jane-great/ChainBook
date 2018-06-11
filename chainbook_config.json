@@ -1,0 +1,22 @@
+{
+  "db": {
+    "uri": "mongodb://127.0.0.1:27017/chainbook",
+    "poolSize": 10,
+    "userName": "",
+    "password": ""
+  },
+  "contract": {
+    "url":"http://localhost:7545"
+  },
+  "thunder" : {
+    "baseURL":"https://sandbox-walletapi.onethingpcs.com"
+  },
+  "local_upload":{
+    "files":"local/files",
+    "images":"local/images"
+  },
+  "server":{
+    "domain":""
+  }
+
+}

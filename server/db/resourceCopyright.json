@@ -1,0 +1,26 @@
+{
+  "workName" : "链书设计大全",
+  "workCategory" : "word",
+  "copyrightAddress" : "版权合约的地址",
+  "resourceAddress" : "资源合约的地址",
+  "resourceHash" : "",
+  "resourceDHash" : "",
+  "localUrl" : "",
+  "account" : "",
+  "author" : [
+    {
+      "authorName" : "eth",
+      "identityType" : "身份证",
+      "identityNum" : "430080989080809801x"
+    }
+  ],
+  "workProperty" : "原创",
+  "rights" : [
+    "发表权",
+    "修改权",
+    "出租权"
+  ],
+  "belong" : "合作作品",
+  "auditStatus" : 1,
+  "publishStatus" : 1
+}

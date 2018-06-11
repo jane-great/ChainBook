@@ -3,3 +3,9 @@ build
 #npm
 node_modules
 npm-debug.log
+.iml
+.idea
+.git
+*.log.*
+local/
+ecosystem.config.js
