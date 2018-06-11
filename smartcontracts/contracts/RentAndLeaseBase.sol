@@ -99,7 +99,7 @@ contract RentAndLeaseBase is Whitelist {
         internal
         returns(bytes32)
     {    // 创建一个租赁合约
-        require(_rent.rentTime >= 1 minutes);
+        require(_rent.rentTime >= 1 seconds);
         bytes32 index = _computeIndex(_contract, _tokenId);
         IndexToRent[index] = _rent;
         emit RentCreat(

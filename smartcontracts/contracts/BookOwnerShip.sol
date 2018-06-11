@@ -86,7 +86,7 @@ contract BookOwnerShip is BookTransaction {    //
     function allowToRead(address _owner, uint256 _tokenId) external view returns(bool) {  // 是否允许阅读
         return(
             (_owns(_owner, _tokenId) && !isLease(_tokenId))                               // 拥有图书，并且图书尚未租赁
-            || ( rentAllowedToAddress[_tokenId] == _owner || isLease(_tokenId))           // 租赁图书，并且尚未过期
+            || ( rentAllowedToAddress[_tokenId] == _owner && isLease(_tokenId))           // 租赁图书，并且尚未过期
         );
     }
 

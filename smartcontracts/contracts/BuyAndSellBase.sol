@@ -46,9 +46,6 @@ contract BuyAndSellBase is Whitelist {
         ERC721Expand  nonFungibleContract = ERC721Expand(_contract);
         require(_owns(_contract, msg.sender , _tokenId));       // 拥有合约
         require(!nonFungibleContract.isRent(_tokenId));
-        //require(nonFungibleContract.tokenIdToLeaser(_tokenId) == address(0));
-        // _escrow(_contract, _transaction.seller, _tokenId);              // 将token所有权移交到交易合约
-        // nonFungibleContract.creatSell(_tokenId);                        // 记录交易
 
         bytes32 index = _computeIndex(_contract, _tokenId);             //
         indexToTransaction[index] = _transaction;                       // 登记交易信息

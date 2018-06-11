@@ -9,8 +9,12 @@ contract BuyAndSell is BuyAndSellBase {
         ceoAddress = msg.sender;
     }
 
-    function setFees(uint256 _price) external onlyCEO {
+    function setFees(uint256 _price) external  {
         buyCut = _price;
+    }
+
+    function getFees() external view returns(uint256) {
+        return buyCut;
     }
 
     // @dev 开始售卖

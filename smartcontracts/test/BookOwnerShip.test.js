@@ -142,10 +142,6 @@ contract("BookOwnerShip",  function(accounts) {
       })
       let addr3 = await instance.getApproved(2);
       assert.equal(addr3, 0, "授权失败");
-
-      await instance.approve(accounts[1], 2, {from: accounts[4]});
-      let addr4 = await instance.getApproved(2);
-      assert.equal(addr4, accounts[1], "授权成功");
     })
 
     it("合约发行总量固定", async () => {

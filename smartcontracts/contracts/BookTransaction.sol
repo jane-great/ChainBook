@@ -101,6 +101,14 @@ contract BookTransaction is BookBase, ERC721Expand {
         return now < bookIndexTorentTime[_tokenId];
     }
 
+    function nowTime() external view returns(uint256){
+      return now;
+    }
+    
+    function rentTimes(uint256 _tokenId) external view returns(uint256){
+      return bookIndexTorentTime[_tokenId];
+    }
+
     function rentTo(uint256 _tokenId, address _leaser, uint256 _time) external {   // 书籍已经出租
         require(!isLease(_tokenId)) ;
         // require(_owns(msg.sender,_tokenId));
@@ -113,7 +121,6 @@ contract BookTransaction is BookBase, ERC721Expand {
     }
 
     function tokenIdToLeaser(uint256 _tokenId) external view returns(address) {
-        require(now > bookIndexTorentTime[_tokenId]);
         return rentAllowedToAddress[_tokenId];
     }
 
