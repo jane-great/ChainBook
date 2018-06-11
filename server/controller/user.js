@@ -1,11 +1,12 @@
-const userDao = require("../dao/user");
 const log4js = require("log4js");
 const logger = log4js.getLogger("controller/user");
 const encrypt = require('../utils/encrypt');
 const thunder = require("../utils/thunder");
+const transactionContract = require("../dao/transactionContract");
+const userDao = require("../dao/user");
+const resourceInfoDao = require("../dao/resourceInfo");
 
 //预出售的状态
-//TODO 常量
 const preSellStatus = 1;
 const preRentStatus = 1;
 
@@ -25,19 +26,22 @@ exports.login = function(req, res, next) {
  * @param res
  * @param next
  */
-exports.logout = function(req, res, next) {
+exports.logout = async function(req, res, next) {
   let user = req.session.passport.user;
   if (user) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("local logout", "enter local logout", { "user": user });
+    logger.info("enter local logout", { "user": user });
+    try{
+      await userDao.deleteSessionById(req.session.id);
+      req.logout();
+      logger.info("success to logout from local", { "username": user.userName });
+      res.send({status:1,msg:"local logout success"});
+    }catch (e) {
+      logger.error("local logout fail",{ "username": user.userName },e);
+      res.send({status:0,msg:"local logout failed"});
     }
-    //TODO 从mongodb中删除session
-    //delMongodb(session.passport.user);
-    req.logout();
-    logger.info("local logout", "success to logout from local", { "username": user.userName });
-    res.send({status:1,msg:"success"});
+    
   } else {
-    logger.warn("authentication error", "local logout failed,no user in req.session.passport object ,maybe already expired.", {
+    logger.warn("local logout failed,no user in req.session.passport object ,maybe already expired.", {
       "session": req.session.id,
       "user": user
     });
@@ -61,14 +65,15 @@ exports.register = async function(req, res, next) {
     pwd:encrypt.getMD5(req.body.pwd,random),
     email:req.body.email,
     mobile:req.body.mobile,
-    randomNum:random
+    randomNum:random,
+    account:"0x7cF2baAe306B1B0476843De3909097be0E6850f3"
   }
   
   //TODO 校验注册的基本内容
   try{
     //1、先向迅雷注册账号 TODO 测试
-    let registerData = await thunder.register(user.email);
-    user.account = registerData.service_id;
+    /*let registerData = await thunder.register(user.email);
+    user.account = registerData.service_id;*/
     //2、保存账号信息至数据库
     await userDao.add(user);
     res.send({status:1,msg:"恭喜注册成功"});
@@ -96,7 +101,7 @@ exports.getCurrentUserInfo = function(req, res, next) {
  * @param next
  */
 exports.getPurchasedResourcesByUser = async function(req, res, next) {
-  logger.info("get purchased resources");
+  logger.info("get purchased file");
   //1、先拿到当前用户信息，判断用户是否是登录状态
   var user = req.session.passport.user;
   //2、从数据库中获取当前已购买的资源列表
@@ -111,7 +116,7 @@ exports.getPurchasedResourcesByUser = async function(req, res, next) {
  * @param next
  */
 exports.getRentResourcesByUser = async function(req, res, next) {
-  logger.info("get rent resources");
+  logger.info("get rent file");
   //1、先拿到当前用户信息，判断用户是否是登录状态
   var user = req.session.passport.user;
   //2、从数据库中获取当前已购买的资源列表
@@ -126,7 +131,7 @@ exports.getRentResourcesByUser = async function(req, res, next) {
  * @param next
  */
 exports.getCopyRightsByUser = async function(req, res, next) {
-  logger.info("get rent resources");
+  logger.info("get rent file");
   //1、先拿到当前用户信息，判断用户是否是登录状态
   var user = req.session.passport.user;
   //2、从数据库中获取当前版权的资源列表
@@ -141,27 +146,61 @@ exports.getCopyRightsByUser = async function(req, res, next) {
  * @param next
  */
 exports.sell = async function(req, res, next) {
-  let tokenId = req.param("tokenId");
-  logger.info("selling resources.", {
-    tokenId: tokenId
+  let tokenId = req.body.tokenId;
+  let resourceId = req.body.resourceId;
+  let sellPrice = req.body.sellPrice;
+  let user = req.session.passport.user;
+  logger.info("selling file.", {
+    tokenId: tokenId,
+    resourceId:resourceId
   });
   
   try {
-    //1、先拿到当前用户信息，判断用户是否是登录状态,获取当前用户的account
+    //todo 校验
+    //1、先查看这个资源个体的交易信息
+    let purchasedResourceDoc = await userDao.findOneUserPurchasedResourceByResourceIdAndTokenId(user._id,resourceId,tokenId);
+    let sellResource = purchasedResourceDoc.purchasedResources[0];
+    //校验这个资源是否可以售卖
+    if(sellResource.sellStatus>0){
+      logger.warn("sell resource fail.",{
+        user:user,
+        sellResource:sellResource
+      });
+      res.send({ status: 0, msg: "资源出售失败，该资源可能已出售、或正在出售中" });
+      return;
+    }
+    //如果这资源已出租也不能售卖
+    if(sellResource.rentOutStatus>1){
+      logger.warn("rent out resource fail.",{
+        user:user,
+        sellResource:sellResource
+      });
+      res.send({ status: 0, msg: "资源出售失败，该资源已出租成功，请出租时间结束后再出售" });
+      return;
+    }
     
-    //2、先判断拿到tokenId和合约地址,已经个人账户，创建交易合约，让资源处于售卖状态
-    
-    //3、合约创建部署成功触发事件，更新登记合约的地址，还有售卖状态至1
-    let updateObj = await userDao.modifySellStatus("5b0e778305373eafe9ceed5f", tokenId, preSellStatus);
-    if (updateObj !== undefined) {
+    let resourceInfo = await resourceInfoDao.findById(resourceId);
+    //2、先判断拿到tokenId和合约地址,是否属于当前用个人账户，并且判断是否属于二手交易的首次交易，如果是则创建交易合约，如果不是就获取交易合约地址合约，将交易合约处于挂起状态，让资源处于售卖状态
+    let transactionAddress = transactionContract.sell(resourceInfo.resourceAddress,tokenId,sellResource.transactionAddress);
+    //3、合约创建部署成功触发事件，更新登记交易合约的地址，还有售卖状态至1
+    var sellResourceObj = {
+      tokenId:tokenId,
+      ownerAccount:user.account,
+      sellPrice:sellPrice,
+      transactionAddress:sellResource.transactionAddress
+    }
+    await resourceInfoDao.addSellResourceById(resourceId,sellResourceObj)
+    let updateObj = await userDao.modifySellStatusAndTransactionAddress(user._id, tokenId, preSellStatus,transactionAddress,sellPrice);
+    if (updateObj !== undefined ) {
       res.send({ status: 1, msg: "the resource sell success." });
     } else {
-      res.send({ status: 0, msg: "资源出售失败，请稍后重试" });
+      res.send({ status: 0, msg: "资源出售失败，请稍后重试." });
     }
   } catch (err) {
-    logger.error("sell resource fail.", {
-      tokenId: tokenId
-    }, err);
+    logger.error("sell resource fail.",{
+      tokenId: tokenId,
+      user:user
+    },err);
     res.send({ status: 0, msg: "资源出售失败，请稍后重试" });
   }
 };
@@ -173,27 +212,66 @@ exports.sell = async function(req, res, next) {
  * @param next
  */
 exports.rentOut = async function(req, res, next) {
-  let tokenId = req.param("tokenId");
-  logger.info("renting out resources.", {
-    tokenId: tokenId
-  });
+    let tokenId = req.body.tokenId;
+    let resourceId = req.body.resourceId;
+    let rentPrice = req.body.rentPrice;
+    let rentTime = req.body.rentTime;
+    let user = req.session.passport.user;
+    logger.info("rentOut file.", {
+      tokenId: tokenId,
+      resourceId:resourceId,
+      rentPrice:rentPrice,
+      rentTime:rentTime,
+      user:user
+    });
   
-  try {
-    //1、先拿到当前用户信息，判断用户是否是登录状态,获取当前用户的account
-    
-    //2、先判断拿到tokenId和合约地址,已经个人账户，创建交易合约，让资源处于售卖状态
-    
-    //3、合约创建部署成功触发事件，更新登记合约的地址，还有售卖状态至1
-    let updateObj = await userDao.modifySellStatus("5b0e778305373eafe9ceed5f", tokenId, preRentStatus);
-    if (updateObj !== undefined) {
-      res.send({ status: 1, msg: "the resource sell success." });
-    } else {
-      res.send({ status: 0, msg: "资源出售失败，请稍后重试" });
+    try {
+      //todo 校验
+      //1、先查看这个资源个体的交易信息
+      let purchasedResourceDoc = await userDao.findOneUserPurchasedResourceByResourceIdAndTokenId(user._id,resourceId,tokenId);
+      let rentOutResource = purchasedResourceDoc.purchasedResources[0];
+      //校验这个资源是否可以售卖
+      if(rentOutResource.sellStatus>0){
+        logger.warn("sell resource fail.",{
+          user:user,
+          rentOutResource:rentOutResource
+        });
+        res.send({ status: 0, msg: "资源出租失败，该资源可能已出售、或正在出售中" });
+        return;
+      }
+      //如果这资源已出租也不能售卖
+      if(rentOutResource.rentOutStatus>0){
+        logger.warn("rent out resource fail.",{
+          user:user,
+          rentOutResource:rentOutResource
+        });
+        res.send({ status: 0, msg: "资源出租失败，该资源已出租成功，请出租时间结束后再出售" });
+        return;
+      }
+  
+      let resourceInfo = await resourceInfoDao.findById(resourceId);
+      //2、先判断拿到tokenId和合约地址,是否属于当前用个人账户，并且判断是否属于二手交易的首次交易，如果是则创建交易合约，如果不是就获取交易合约地址合约，将交易合约处于挂起状态，让资源处于售卖状态
+      let transactionAddress = transactionContract.rentOut(resourceInfo.resourceAddress,tokenId,rentOutResource.transactionAddress);
+      //3、合约创建部署成功触发事件，更新登记交易合约的地址，还有售卖状态至1
+      var rentOutResourceObj = {
+        tokenId:tokenId,
+        ownerAccount:user.account,
+        rentPrice:rentPrice,
+        rentTime:rentTime,
+        transactionAddress:rentOutResource.transactionAddress
+      }
+      await resourceInfoDao.addRentOutResourceById(resourceId,rentOutResourceObj)
+      let updateObj = await userDao.modifyRentStatusAndTransactionAddress(user._id, tokenId, preRentStatus,rentPrice,transactionAddress);
+      if (updateObj !== undefined ) {
+        res.send({ status: 1, msg: "the resource rent out success." });
+      } else {
+        res.send({ status: 0, msg: "资源出租失败，请稍后重试" });
+      }
+    } catch (err) {
+      logger.error("sell resource fail.",{
+        tokenId: tokenId,
+        user:user
+      },err);
+      res.send({ status: 0, msg: "资源出租失败，请稍后重试" });
     }
-  } catch (err) {
-    logger.error("rent out resource fail.", {
-      tokenId: tokenId
-    }, err);
-    res.send({ status: 0, msg: "资源出租失败，请稍后重试" });
-  }
-};
+}

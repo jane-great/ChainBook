@@ -1,11 +1,21 @@
 {
-  "resourceName":"以太坊白皮书",
-  "desc":"介绍以太坊的架构基础，及其特性",
-  "limit":10000,
-  "coverImage":"url",
-  "price":"10.00",
-  "copyrightAddress":"版权合约的地址",
-  "resourceAddress":"资源合约的地址",
-  "authorAccount":"作者的地址",
-  "hasSellOut":0
+  "purchasedResources" : [],
+  "resourceName" : "test12345",
+  "desc" : "1245678",
+  "total" : 10000.0,
+  "coverImage" : "url",
+  "price" : "10.00",
+  "copyrightAddress" : "版权合约的地址",
+  "resourceAddress" : "资源合约的地址",
+  "authorAccount" : "作者的地址",
+  "hasSellOut" : 0,
+  "tenantableResources" : [
+    {
+      "tokenId" : "test_tokenId",
+      "ownerAccount" : "test",
+      "rentPrice" : "1.00",
+      "rentTime" : 1
+    }
+  ]
 }
+

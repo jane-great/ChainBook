@@ -7,6 +7,7 @@ var helloWorld = require('./controller/helloWorld');
 var config = require('./config');
 var passport = require("passport");
 var auth = require("./controller/auth");
+var fs = require("fs");
 
 var URL = "/" + config.appName;
 
@@ -28,23 +29,30 @@ router.get(URL+"/user/renderUser",auth.isAuthenticated, user.getCurrentUserInfo)
 router.get(URL+"/user/getCopyRightsByUser",auth.isAuthenticated,user.getCopyRightsByUser);
 router.get(URL+"/user/getPurchasedResourcesByUser",auth.isAuthenticated,user.getPurchasedResourcesByUser);
 router.get(URL+"/user/getRentResourcesByUser",auth.isAuthenticated,user.getRentResourcesByUser);
-router.get(URL+"/user/purchasedResources/sell",auth.isAuthenticated,user.sell);
-router.get(URL+"/user/purchasedResource/rentOut",auth.isAuthenticated,user.rentOut);
-
-//TODO:获取所有可以二次售卖的图书，分页和查询
-//TODO:获取所有可以租赁的图书，分页和查询
-//TODO:获取所有首发图书，分页和查询
+router.post(URL+"/user/purchasedResources/sell",auth.isAuthenticated,user.sell);
+router.post(URL+"/user/purchasedResource/rentOut",auth.isAuthenticated,user.rentOut);
 
 //版权
 router.post(URL+"/copyright/apply",auth.isAuthenticated,resourceCopyright.applyCopyright);
-router.put(URL+"/copyright/upload/sample",auth.isAuthenticated,resourceCopyright.uploadSample);
-router.get(URL+"/copyright/getResourceCopyrightDetailById",auth.isAuthenticated,resourceCopyright.getResourceCopyrightDetailById);
+router.post(URL+"/copyright/upload/sample",auth.isAuthenticated,resourceCopyright.uploadSample);
+router.get(URL+"/copyright/getResourceCopyrightDetailById",resourceCopyright.getResourceCopyrightDetailById);
 
 //资源信息
-router.post(URL+"/resource/publish",auth.isAuthenticated,auth.isAuthenticated,resourceInfo.publishResource);
-router.put(URL+"/resource/uploadCoverImg",auth.isAuthenticated,resourceInfo.uploadCoverImg);
-router.get(URL+"/resource/getResourceDetailById",auth.isAuthenticated,resourceInfo.getResourceDetailById);
-router.get(URL+"/resource/buy",auth.isAuthenticated,resourceInfo.buy);
-router.get(URL+"/resource/rent",auth.isAuthenticated,resourceInfo.rent);
-
+router.post(URL+"/resource/publish",auth.isAuthenticated,resourceInfo.publishResource);
+router.post(URL+"/resource/upload/coverImg",resourceInfo.uploadCoverImg);
+//测试上传用
+router.get(URL+'/form',function(req, res, next) {
+  fs.readFile('dist/testUploadImage.html', {encoding: 'utf8'},function(err,data) {
+    res.send(data);
+  });
+});
+router.get(URL+"/resource/getResourceDetailById",resourceInfo.getResourceDetailById);
+router.post(URL+"/resource/getResourceListByPage",resourceInfo.getResourceListByPage);
+router.post(URL+"/resource/getPurchasedResourceListByPage",resourceInfo.getPurchasedResourceListByPage);
+router.post(URL+"/resource/getTenantableResourceListByPage",resourceInfo.getTenantableResourceListByPage);
+router.get(URL+"/resource/getPurchasedResourceOwnerListById",resourceInfo.getPurchasedResourceOwnerListById);
+router.get(URL+"/resource/getTenantableResourceOwnerListById",resourceInfo.getTenantableResourceOwnerListById);
+router.post(URL+"/resource/buyFromAuthor",auth.isAuthenticated,resourceInfo.buyFromAuthor);
+router.post(URL+"/resource/buy",auth.isAuthenticated,resourceInfo.buy);
+router.post(URL+"/resource/rent",auth.isAuthenticated,resourceInfo.rent);
 module.exports = router;

@@ -46,8 +46,14 @@ var notNullAssert = function(param) {
   }
 }
 
+var notEmptyObjectAssert = function(obj) {
+  if(obj == undefined || obj == null || util.isEmpty(obj)){
+    throw new Error("obj is empty");
+  }
+}
 exports.isEmptyObject = isEmptyObject;
 exports.toRegex = toRegex;
 exports.uniqueArray = uniqueArray;
 exports.notNullAssert = notNullAssert;
+exports.notEmptyObjectAssert = notEmptyObjectAssert;
 

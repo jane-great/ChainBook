@@ -1,30 +1,40 @@
 {
-  "userName":"admin",
-  "pwd":"admin",
-  "account":"0x7cF2baAe306B1B0476843De3909097be0E6850f3",
-  "mobile":"1234567890",
-  "email":"test@163.com",
-  "copyright":[{
-    "workName":"链书设计大全",
-    "resourcesIpfsHash":"0x7cF2baAe306B1B0476843De3909097be0E6850f3",
-    "resourcesIpfsDHash":"0x7cF2baAe306B1B0476843De3909097be0E6850f3",
-    "localUrl":"http://localhost:3000/ChainBook/login?userName=admin&pwd=admin",
-    "copyrightAddress":"版权合约的地址",
-    "resourcesAddress":"版权合约的地址"
-  }],
-  "purchasedResources":[{
-    "resourceName":"以太坊白皮书",
-    "type":"book",
-    "tokenId":"book_contracts_token_id",
-    "sellStatus":0,
-    "sellPrice":"20.00",
-    "rentOutStatus":0,
-    "rentPrice":"2.00"
-  }],
-  "rentResources":[{
-    "resourceName":"以太猫黄皮书",
-    "type":"book",
-    "tokenId":"book_contracts_token_id",
-    "rentTime":30
-  }]
+  "userName" : "admin",
+  "pwd" : "c803dc0fc2d56cb856692fa146be7da9",
+  "account" : "0x7cF2baAe306B1B0476843De3909097be0E6850f3",
+  "mobile" : "1234567890",
+  "email" : "test@163.com",
+  "randomNum" : "nq0n7i",
+  "copyright" : [
+    {
+      "copyrightId" : "5b0e792605373eafe9ceed61",
+      "workName" : "链书设计大全",
+      "resourcesIpfsHash" : "0x7cF2baAe306B1B0476843De3909097be0E6850f3",
+      "resourcesIpfsDHash" : "0x7cF2baAe306B1B0476843De3909097be0E6850f3",
+      "localUrl" : "http://localhost:3000/ChainBook/login?userName=admin&pwd=admin",
+      "copyrightAddress" : "版权合约的地址",
+      "resourcesAddress" : "资源合约地址"
+    }
+  ],
+  "purchasedResources" : [
+    {
+      "resourceId" : "5b0f597905373eafe9ceed62",
+      "resourceName" : "以太坊白皮书",
+      "type" : "book",
+      "tokenId" : "book_contracts_token_id",
+      "sellStatus" : 1,
+      "sellPrice" : "20.00",
+      "rentOutStatus" : 0,
+      "rentPrice" : "2.00"
+    }
+  ],
+  "rentResources" : [
+    {
+      "resourceId" : "5b0f597905373eafe9ceed62",
+      "resourceName" : "以太坊白皮书",
+      "type" : "book",
+      "tokenId" : "book_contracts_token_id",
+      "rentTime" : 30
+    }
+  ]
 }
