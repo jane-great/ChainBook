@@ -34,6 +34,7 @@ router.post(URL+"/user/purchasedResource/rentOut",auth.isAuthenticated,user.rent
 
 //版权
 router.post(URL+"/copyright/apply",auth.isAuthenticated,resourceCopyright.applyCopyright);
+router.post(URL+"/copyright/audit",auth.isAuthenticated,resourceCopyright.auditCopyright);
 router.post(URL+"/copyright/upload/sample",resourceCopyright.uploadSample);
 router.get(URL+"/copyright/getResourceCopyrightDetailById",resourceCopyright.getResourceCopyrightDetailById);
 

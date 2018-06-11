@@ -452,6 +452,46 @@ UserDao.prototype.modifyCopyrightInfo = function(id,copyrightId,resourceAddress)
   }
 }
 
+/**
+ * 登记出售已有的某个资源
+ * @param id
+ * @param tokenId
+ * @param sellStatus 0:不售卖，1：售卖，2：已售卖
+ * @returns {*}
+ */
+UserDao.prototype.modifyCopyrightAuditInfo = function(id,copyrightId,resourcesIpfsHash,resourcesIpfsDHash,copyrightAddress){
+  try{
+    ObjectUtil.notNullAssert(id);
+    ObjectUtil.notNullAssert(copyrightId);
+    ObjectUtil.notNullAssert(resourcesIpfsHash);
+    ObjectUtil.notNullAssert(resourcesIpfsDHash);
+    ObjectUtil.notNullAssert(copyrightAddress);
+    
+    return new Promise((resolve,reject) => {
+      User.update({'_id':id,'copyrights.copyrightId':copyrightId},
+        {$set:{ 'copyrights.$.resourcesIpfsHash': resourcesIpfsHash,
+            'copyrights.$.resourcesIpfsDHash': resourcesIpfsDHash,
+            'copyrights.$.copyrightAddress': copyrightAddress,
+          }},function(err,updateObj){
+          if(err){
+            reject(err);
+          }else{
+            resolve(updateObj);
+          }
+        }
+      )
+    });
+  }catch(err){
+    logger.error("modifyCopyrightInfo error.",{
+      userId:id,
+      copyrightId:copyrightId
+    },err);
+    return new Promise(reject =>{
+      reject(err);
+    });
+  }
+}
+
 UserDao.prototype.buildEmptyCopyright = function(){
   return {
     copyrightId:"",

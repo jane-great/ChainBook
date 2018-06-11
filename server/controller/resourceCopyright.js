@@ -6,6 +6,7 @@ const copyrightContractDao = require("../dao/copyrightContract");
 const objectUtils = require("../utils/objectUtils");
 const encrypt = require("../utils/encrypt");
 const localUpload = require("../component/localUpload");
+const ipfsResourcesDao = require("../component/ipfsResources");
 
 const NO_AUDIT = 0;
 const NO_PUBLISH = 0;
@@ -82,33 +83,57 @@ exports.uploadSample = function(req,res,next){
   });
 }
 
+exports.auditCopyright = async function(req,res,next){
+  let user = req.session.passport.user;
+  let copyrightId = req.body.copyrightId;
+  let isSuccess = await registerCopyright(user,copyrightId);
+  if(isSuccess){
+    res.send({status:1,msg:"审核版权成功"});
+  }else{
+    res.send({status:0,msg:"审核版权失败"});
+  }
+}
+
+
 /**
- * 登记版权至合约，将被登记合约的定时任务调用
+ * 登记版权至合约，将被登记合约的定时任务调用 TODO
  * @param req
  * @param res
  * @param next
  */
-exports.registerCopyright = async function(userObj,id){
+let registerCopyright = async function(userObj,copyrightId){
   try{
     //1、根据userAccount捞取基本用户信息
     let account = userObj.account;
-    let obj = await resourceCopyrightDao.findOne({_id:id,account:account});
+    let copyrightObj = await resourceCopyrightDao.findOne({_id:copyrightId,account:account});
+    if(copyrightObj.auditStatus > 0){
+      logger.warn("该版权审核通过或者失败",{
+        userObj:userObj,
+        copyrightObj:copyrightObj
+      });
+      return false;
+    }
     logger.info("register copyright",{
       user:userObj,
-      copyrightId:id
+      copyrightId:copyrightId,
+      copyrightObj:copyrightObj
     });
-    //2、将本地的最新样本上传至ipfs，并获得hash值 TODO IPFS
-    let resourceHash = "";
+    //2、将本地的最新样本上传至ipfs，并获得hash值
+    let resourceHash = await ipfsResourcesDao.upload(copyrightObj.localUrl,userObj);
     let resourceDHash = encrypt.getMD5(resourceHash,"");
     //3、调用合约的登记版权的方法，登记合约,保存版权的信息和版权的hash值，并返回合约地址
-    let copyrightAddress = await copyrightContractDao.registerCopyright(userObj,obj);
+    let copyrightAddress = await copyrightContractDao.registerCopyright(userObj,copyrightObj);
     //4、登记hash，dhash,合约地址，审核状态等至resourceCopyright和user中
-    await resourceCopyrightDao.updateResourceCopyrightInfo(obj._id,copyrightAddress,resourceHash,resourceDHash,1);
+    await resourceCopyrightDao.updateResourceCopyrightInfo(copyrightObj._id,copyrightAddress,resourceHash,resourceDHash,1);
+    //5、登记到用户的版权信息下
+    await userDao.modifyCopyrightAuditInfo(userObj._id,copyrightObj._id,resourceHash,resourceDHash,copyrightAddress);
+    return true;
   }catch (e) {
     logger.error("registerCopyright fail.",{
       user:userObj,
-      copyrightId:id
+      copyrightId:copyrightId
     },e);
+    return false;
   }
 }
 
