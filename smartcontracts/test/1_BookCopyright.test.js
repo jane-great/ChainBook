@@ -1,11 +1,14 @@
 var BookCopyrightCreate = artifacts.require("./BookCopyrightCreate.sol");
 
 contract("BookCopyrightCreate", function(accounts) {
-  var copyrightInstance;
+  let instance;
+  BookCopyrightCreate.deployed().then(function(ins) {
+    instance = ins;       // 获取实例
+  })
 
   it("合约初始化正确", function() {
     return BookCopyrightCreate.deployed().then(function(instance) {
-      console.log(instance.address);
+      // console.log(instance.address);
       return instance.ceoAddress();
     }).then(function(address) {
       assert.equal(address,accounts[0], "ceoAddress地址正确");
