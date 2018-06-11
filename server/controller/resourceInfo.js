@@ -164,6 +164,10 @@ exports.buy = async function (req, res, next) {
     //TODO 校验自己不能买自己出售的书
     let sellResourceDoc = await resourceInfoDao.findSellResourceOwner(resourceId,tokenId);
     let sellResource = sellResourceDoc[0].sellResources[0];
+    if(sellResource.ownerAccount == user){
+      res.res.send({status:0,msg:"购买二手资源失败,自己不能买自己的书"});
+      return;
+    }
     //2.调用交易合约的购买方法，合约里转移所有权
     let isSuccess = transactionContractDao.buy(tokenId,sellResource.transactionAddress,userAccount,sellResource.ownerAccount);
     if(!isSuccess){
@@ -226,6 +230,11 @@ exports.rent = async function(req, res, next) {
     //TODO 校验自己不能买自己出售的书
     let rentResourceDoc = await resourceInfoDao.findTenantableResourceOwner(resourceId,tokenId);
     let rentResource = rentResourceDoc[0].tenantableResources[0];
+  
+    if(rentResource.ownerAccount == user.account){
+      res.send({status:0,msg:"租赁资源失败,自己不能租自己的书"});
+      return;
+    }
     //2.调用交易合约的购买方法，合约里转移所有权
     let isSuccess = transactionContractDao.rent(tokenId,rentResource.transactionAddress,userAccount,rentResource.ownerAccount);
     if(!isSuccess){

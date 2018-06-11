@@ -144,8 +144,9 @@ UserDao.prototype.findOneUserPurchasedResourceByResourceIdAndTokenId = function 
     User.findOne({
       _id:userId,
       "purchasedResources.resourceId":resourceId,
-      "purchasedResources.tokenId":tokenId
-    },{"purchasedResources.$":1},function(err,data) {
+      "purchasedResources.tokenId":tokenId,
+      "purchasedResources.sellStatus":0
+  },{"purchasedResources":{$slice:-1}},function(err,data) {
       if(err){
         reject(err);
       }else{
@@ -166,6 +167,8 @@ UserDao.prototype.addRentResourceByUser = function(id,rentResourceObj){
   try{
     ObjectUtil.notNullAssert(id);
     ObjectUtil.notNullAssert(rentResourceObj);
+    
+    this.findOneUserPurchasedResourceByResourceIdAndTokenId()
     
     return new Promise((resolve, reject) => {
       User.update({_id:id},{"$push":{"rentResources":rentResourceObj}},function(err,updateObj){
@@ -196,7 +199,7 @@ UserDao.prototype.getCopyrightsByUserId = function(id){
   try{
     ObjectUtil.notNullAssert(id);
     return new Promise((resolve,reject)=>{
-      User.find({_id:id},{copyright:1},function(err,list){
+      User.find({_id:id},{copyrights:1},function(err,list){
         if(err) {
           reject(err);
         } else {
