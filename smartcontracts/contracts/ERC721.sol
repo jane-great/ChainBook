@@ -1,4 +1,4 @@
-pragma solidity^0.4.24;
+pragma solidity^0.4.21;
 
 /// @title ERC-721 Non-Fungible Token Standard
 /// @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
@@ -80,4 +80,3 @@ contract ERC721 /* is ERC165 */ {
     ///  Metadata JSON Schema".
     // function tokenURI(uint256 _tokenId) external view returns (string);
 }
- 
