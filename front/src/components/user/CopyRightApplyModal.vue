@@ -41,6 +41,7 @@
           ref="upload"
           name="sample"
           action="/ChainBook/copyright/upload/sample"
+          header="{ 'Content-Type': 'multipart/form-data;' }"
           :on-success="handleUpdateSuccess"
           :file-list="data.samplePath">
           <el-button slot="trigger" size="small" type="primary">选取文件</el-button>

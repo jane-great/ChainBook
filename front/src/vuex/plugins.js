@@ -19,7 +19,7 @@ function getRequestInstance() {
     const headers = {};
 
     // 给 config.url 添加上baseUrl
-    config.url = `/ChainBook/${config.url}`;
+    config.url = `/ChainBook${config.url}`;
 
     // 后端不支持 json 格式的 data，需要将 json 格式转为 x-www-form-urlencoded
     if (typeof config.data === 'object' && !(config.data instanceof FormData)) {

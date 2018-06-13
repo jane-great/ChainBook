@@ -23,15 +23,27 @@
       :confirm-fn="handleModalButtonClick"
       :cancel-fn="handleModalButtonClick">
     </copy-right-apply-modal>
+    <copy-right-publish-modal
+      :visible="publishModal.visible"
+      :data="publishModal.data"
+      :type="publishModal.type"
+      :confirm-fn="handleModalButtonClick"
+      :cancel-fn="handleModalButtonClick">
+    </copy-right-publish-modal>
   </div>
 </template>
 
 <script>
 import CopyRightApplyModal from 'src/components/user/CopyRightApplyModal';
+import CopyRightPublishModal from 'src/components/user/CopyRightPublishModal';
 import TableList from 'src/components/user/TableList';
 
 import { ListType, Operation } from 'src/config/user/enum';
-import { getTableHeader, getInitData } from 'src/config/user/data';
+import { 
+  getTableHeader, 
+  getCopyRightApplyInitData,
+  getCopyRightPublishInitData 
+} from 'src/config/user/data';
 import { getApiToRow, getResToApi } from 'src/config/user/converter';
 
 export default {
@@ -41,7 +53,12 @@ export default {
       listType: ListType.CopyRight,
       dataList: getApiToRow(ListType.CopyRight),
       resModal: {
-        data: getInitData(ListType.CopyRight),
+        data: getCopyRightApplyInitData(),
+        visible: false,
+        type: null
+      },
+      publishModal: {
+        data: getCopyRightPublishInitData(),
         visible: false,
         type: null
       }
@@ -49,6 +66,7 @@ export default {
   },
   components: {
     CopyRightApplyModal,
+    CopyRightPublishModal,
     TableList
   },
   computed: {
@@ -103,7 +121,7 @@ export default {
     
     handleCreateCopyRight() {
       Object.assign(this.resModal, {
-        data: getInitData(ListType.CopyRight),
+        data: getCopyRightApplyInitData(),
         visible: true,
         type: Operation.Create
       });
@@ -112,10 +130,17 @@ export default {
     handleButtonClick(index, row, name) {
       switch (name) {
         case 'publish': {
-          this.$api.copyright.publish(row).then(() => {
-            this.$message({ message: '发行成功', type: 'success' });
-            this.getList();
-          }).catch(this.$message);
+          // this.$api.copyright.publish(row).then(() => {
+          //   this.$message({ message: '发行成功', type: 'success' });
+          //   this.getList();
+          // }).catch(this.$message);
+          Object.assign(this.publishModal, {
+            data: Object.assign(getCopyRightPublishInitData(), {
+              copyrightId: row.copyrightId,
+            }),
+            type: Operation.Publish,
+            visible: true
+          });
           break;
         }
         case 'purchase': {
@@ -150,6 +175,14 @@ export default {
         }
         case Operation.Cancel: {
           this.resModal.visible = false;
+          this.publishModal.visible = false;
+          break;
+        }
+        case Operation.Publish: {
+          this.$api.copyright.publish(this.publishModal.data).then(() => {
+            this.$message({ message: '发行成功', type: 'success' });
+            this.getList();
+          }).catch(this.$message);
           break;
         }
         default: 

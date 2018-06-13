@@ -5,7 +5,7 @@ export const getTableHeader = (listType) => {
     case ListType.CopyRight: {
       return [
         { field: 'copyrightId', name: '版权ID' }, 
-        { field: 'workName', name: '书名' }, 
+        { field: 'workName', name: '版权名称' }, 
         { field: 'copyrightAddress', name: '版权合约地址' }, 
         { field: 'resourcesAddress', name: '资源合约地址' }, 
         { field: 'resourcesIpfsHash', name: '资源ipfsHash', hidden: true }, 
@@ -38,29 +38,27 @@ export const getTableHeader = (listType) => {
       return [];
   }
 };
-export const getInitData = (listType) => {
-  switch (listType) {
-    case ListType.CopyRight:
-      return {
-        workName: '测试新增版权',
-        workCategory: '',
-        samplePath: [{
-          name: 'test',
-          url: 'local/file/sample-xv20s51528202601031.doc'
-        }],
-        authors: [{
-          authorName: 'zebin',
-          identityType: '身份证',
-          identityNum: '12345678'
-        }],
-        workProperty: '',
-        rights: [],
-        belong: ''        
-      };
-    case ListType.Purchase:
-    case ListType.Rent:
-    default:
-      return [];
-  }
-};
-
+export const getCopyRightApplyInitData = () => ({
+  workName: '测试新增版权',
+  workCategory: '',
+  samplePath: [{
+    name: 'test',
+    url: 'local/file/sample-xv20s51528202601031.doc'
+  }],
+  authors: [{
+    authorName: 'zebin',
+    identityType: '身份证',
+    identityNum: '12345678'
+  }],
+  workProperty: '',
+  rights: [],
+  belong: ''
+});
+export const getCopyRightPublishInitData = () => ({
+  copyrightId: '',
+  resourceName: '',
+  total: '',
+  coverImage: '',
+  // coverImage: 'http://159.203.96.61:3000/images/coverImage-ws3nlm1528896785295.jpg',
+  price: ''
+});

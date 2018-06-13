@@ -6,5 +6,7 @@ export const ListType = {
 export const Operation = {
   Create: 1,
   Update: 2,
-  Remove: 3
+  Remove: 3,
+  Publish: 4,
+  Preview: 5 // 发行
 };
