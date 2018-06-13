@@ -1,35 +1,46 @@
 const ipfsAPI = require('ipfs-api');
 const log4js = require('log4js');
 const fs = require('fs');
+const config = require("../config");
 
 
 const logger = log4js.getLogger("dao/ipfsResources");
-const ipfs = ipfsAPI({host:'localhost',port:'5001',protocol:'http'});
-const baseUrl = "../../local/file"
+const baseUrl = "local/files/";
 
 
-const IpfsResourcesDao = class {
-  constructor() {}
+const IpfsResourcesDao = class ipfsResources{
+  constructor() {
+    ipfsResources.ipfs = ipfsAPI({host:config.ipfs.host,port:config.ipfs.port,protocol:config.ipfs.protocol});
+  }
   
   /**
    * 返回当前上传后的hash值
    * @param localUrl
    * @returns {Promise<any>}
    */
-  upload(localUrl) {
+  upload(localUrl,userObj) {
     return new Promise(function(resolve,reject) {
-      fs.readFile(baseUrl+localUrl,function(err,data) {
+      fs.readFile(localUrl,function(err,data) {
         if(err){
-          logger.error("upload file to ipfs fail.",localUrl,err);
+          logger.error("upload file to ipfs fail.",{
+            localUrl:localUrl,
+            userObj:userObj
+          },err);
           reject(err);
           return;
         }
         const descBuffer = Buffer.from(data,'utf-8');
-        ipfs.add(descBuffer).then((response) => {
-          logger.info(response);
+        ipfsResources.ipfs.add(descBuffer).then((response) => {
+          logger.info("upload ipfs success.",{
+            response:response,
+            userObj:userObj
+          });
           resolve(response[0].hash);
         }).catch((err) => {
-          console.error(err);
+          logger.error("upload ipfs error.",{
+            userObj:userObj,
+            localUrl:localUrl
+          });
           reject(err);
         });
       });
@@ -38,14 +49,14 @@ const IpfsResourcesDao = class {
   
   download(hash) {
     return new Promise((resolve, reject) => {
-      ipfs.cat(hash).then((stream) => {
-        let resource = this.utf8ArrayToStr(stream);
+      ipfsResources.ipfs.cat(hash).then((stream) => {
+        let resource = this._utf8ArrayToStr(stream);
     
       });
     });
     
   }
-  _utf8ArrayToStr = (array) => {
+  _utf8ArrayToStr(array){
     var out, i, len, c;
     var char2, char3;
     out = "";

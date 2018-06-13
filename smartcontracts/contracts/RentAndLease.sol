@@ -31,7 +31,7 @@ contract RentAndLease is RentAndLeaseBase {
         returns(bytes32)
     {
         require(_owns(_contract, _renter, _tokenId));   // 拥有token
-        require(_rentTime > 1 seconds);                 // 出租时间大于1s
+        require(_rentTime >= 1 seconds);                 // 出租时间大于1s
         require(_price >= 0);
         require(_price == uint128(_price));             // 拒绝超大额交易
         // _escrow(_contract, _renter, _tokenId);       //  ==== 上层实现 ====
@@ -136,8 +136,12 @@ contract RentAndLease is RentAndLeaseBase {
 
     // @dev 设置平台手续费
     // @ param  _ownercut 万分之几的手续费
-    function setFees(uint256 _ownercut) external onlyCEO {
+    function setFees(uint256 _ownercut) external  {
         rentCut = _ownercut;
+    }
+
+    function getFees() external view returns(uint256) {
+        return rentCut;
     }
 
     function getRenter(address _contract, uint256 _tokenId) external view returns(address) {

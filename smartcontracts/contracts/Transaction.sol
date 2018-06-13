@@ -31,7 +31,7 @@ contract Transaction is AccessControl, PullPayment {
     event Sell(address _contract, uint256 _tokenId, address _seller);
     event Rent(address _contract, uint256 _tokenId, address _renter);
     event Lease(address _contract, uint256 _tokenId, address _leaser);
-    event BuyCancel(address _contract, uint256 _tokenId);
+    event SellCancel(address _contract, uint256 _tokenId);
     event RentCancel(address _contract, uint256 _tokenId);
 
     // @dev 提取账户余额，不只是ceo
@@ -84,10 +84,19 @@ contract Transaction is AccessControl, PullPayment {
     }
 
     // 设置租赁费用，只有ceo可以调用
-    function setLeaseFess(uint256 _price) external onlyCEO {
+    function setLeaseFees(uint256 _price) external onlyCEO {
         rentAndLease.setFees(_price);
     }
 
+    // 获取买卖费用
+    function getBuyFees() external view returns(uint256) {
+        return buyAndSell.getFees();
+    }
+
+    // 获取租赁费用
+    function getLeaseFees() external view returns(uint256) {
+        return rentAndLease.getFees();
+    }
 
     //  判断平台是否授权买卖(租赁)token
     function getApproved(address _contract, uint256 _tokenId) public view returns(bool) {
@@ -142,7 +151,7 @@ contract Transaction is AccessControl, PullPayment {
         require(rentAndLease != address(0));
         require(_tokenId == uint32(_tokenId));
         require(_price == uint128(_price));
-        require(_rentTime >= 1 minutes);
+        require(_rentTime > 1 seconds);
         require(_rentTime == uint128(_rentTime));
         ERC721Expand  nonFungibleContract = ERC721Expand(_contract);
         require(nonFungibleContract.ownerOf(_tokenId) == msg.sender);
@@ -204,6 +213,7 @@ contract Transaction is AccessControl, PullPayment {
         buyAndSell.cancelSell(_contract, _tokenId, msg.sender);
         nonFungibleContract.sellCancel(_tokenId);
         nonFungibleContract.transfer(msg.sender, _tokenId);
+        emit SellCancel(_contract, _tokenId);
     }
 
     // @dev 取消租赁
@@ -213,12 +223,12 @@ contract Transaction is AccessControl, PullPayment {
        ERC721Expand  nonFungibleContract = ERC721Expand(_contract);
        nonFungibleContract.rentCancel(_tokenId);
        rentAndLease.cancelRent(_contract, _tokenId, msg.sender);
+       emit RentCancel(_contract, _tokenId);
    }
 
     // @dev 修改售卖价格
     function setSellPrice(address _contract, uint256 _tokenId, uint256 _price) external {
         buyAndSell.setPrice(_contract, _tokenId, _price, msg.sender);
-
     }
 
     // @dev 修改出租信息

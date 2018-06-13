@@ -17,6 +17,11 @@
   },
   "server":{
     "domain":""
+  },
+  "ipfs":{
+    "host":"localhost",
+    "port":5001,
+    "protocol":"http"
   }
 
 }
