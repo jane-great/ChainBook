@@ -112,7 +112,7 @@ export default {
           this.$message({ message: '注册成功', type: 'success' });
           this.loginModal.visible = false;
           this.getUsername(userName);
-        }).catch(() => {});
+        }).catch(this.$message);
       } else {
         this.$api.user.localLogin({
           userName,
@@ -121,7 +121,7 @@ export default {
           this.$message({ message: '登录成功', type: 'success' });
           this.loginModal.visible = false;
           this.getUsername(userName);
-        }).catch(() => {});
+        }).catch(this.$message);
       }
     },
     handleLoginCancel() {
@@ -131,7 +131,7 @@ export default {
       this.$api.user.localLogout().then(() => {
         this.$message({ message: '注销成功', type: 'success' });
         this.getUsername('');
-      }).catch(() => {});
+      }).catch(this.$message);
     }
   }
 };
@@ -178,6 +178,7 @@ body {
       text-align: center;
       a {
         display: block;
+        font-size: 16px;
       }
     }
   }

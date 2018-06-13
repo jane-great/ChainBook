@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row :gutter="20">
+    <!-- <el-row :gutter="20">
       <el-col :span="16">
         <div class="grid-content bg-purple">
           <el-tabs v-model="activeBuyTab" type="card" @tab-click="handleClick">
@@ -34,7 +34,8 @@
           二手热门
         </div>
       </el-col>
-    </el-row>
+    </el-row> -->
+    待开发
   </div>
 </template>
 <script>
@@ -45,8 +46,8 @@ export default {
     };
   },
   methods: {
-    handleClick(tab, event) {
-      console.log(tab, event);
+    handleClick() {
+      // console.log(tab, event);
     }
   }
 };

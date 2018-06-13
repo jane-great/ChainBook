@@ -18,7 +18,7 @@ export const routerMap = [
   },
   {
     path: '/FirstResource',
-    name: FirstResource,
+    name: 'FirstResource',
     component: FirstResource,
     title: '首发资源'
   },
@@ -30,7 +30,7 @@ export const routerMap = [
   },
   {
     path: '/Rent',
-    name: Rent,
+    name: 'Rent',
     component: Rent,
     title: '租赁市场'
   },
