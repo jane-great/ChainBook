@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="dialogTitle" :visible="visible" :show-close="false">
+  <el-dialog :title="dialogTitle" :visible="visible" :show-close="false" :width="'500px'">
     <el-form :model="data" status-icon :rules="rules" ref="form" label-width="100px" class="register">
       <el-form-item label="账号" prop="username">
         <el-input v-model.number="data.userName"></el-input>
