@@ -17,7 +17,8 @@
       :key="header.field"
       :label="header.name"
       :prop="header.field"
-      :min-width="header.width">
+      :min-width="header.width"
+      @row-click="handleRowClick">
     </el-table-column>
 
     <el-table-column label="操作">
@@ -44,7 +45,20 @@ export default {
     tableHeaderNoHidden() {
       return this.tableHeader.filter(header => !header.hidden);
     }
+  },
+  methods: {
+    handleRowClick(row, event, column) {
+      console.log(row, event, column);
+    }
   }
 };
 </script>
+<style lang="scss">
+.demo-table-expand {
+  .el-form-item {
+    width: 100%;
+  }
+}
+</style>
+
 

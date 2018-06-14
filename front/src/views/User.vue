@@ -5,7 +5,7 @@
         <div style="text-align: right;">
           <el-button
             size="mini"
-            @click="handleCreateCopyRight">新增版权登记书籍</el-button>
+            @click="handleCreateCopyRight">新增版权登记</el-button>
         </div>
         <table-list
           :data="dataList"
@@ -30,19 +30,27 @@
       :confirm-fn="handleModalButtonClick"
       :cancel-fn="handleModalButtonClick">
     </copy-right-publish-modal>
+    <copy-right-rent-modal
+      :visible="rentModal.visible"
+      :data="rentModal.data"
+      :type="rentModal.type"
+      :confirm-fn="handleModalButtonClick"
+      :cancel-fn="handleModalButtonClick">
+    </copy-right-rent-modal>
   </div>
 </template>
 
 <script>
 import CopyRightApplyModal from 'src/components/user/CopyRightApplyModal';
 import CopyRightPublishModal from 'src/components/user/CopyRightPublishModal';
+import CopyRightRentModal from 'src/components/user/CopyRightRentModal';
 import TableList from 'src/components/user/TableList';
 
 import { ListType, Operation } from 'src/config/user/enum';
 import { 
   getTableHeader, 
   getCopyRightApplyInitData,
-  getCopyRightPublishInitData 
+  getCopyRightPublishInitData
 } from 'src/config/user/data';
 import { getApiToRow, getResToApi } from 'src/config/user/converter';
 
@@ -61,12 +69,18 @@ export default {
         data: getCopyRightPublishInitData(),
         visible: false,
         type: null
+      },
+      rentModal: {
+        data: {},
+        visible: false,
+        type: null
       }
     };
   },
   components: {
     CopyRightApplyModal,
     CopyRightPublishModal,
+    CopyRightRentModal,
     TableList
   },
   computed: {
@@ -144,6 +158,17 @@ export default {
 
     handleButtonClick(index, row, name) {
       switch (name) {
+        // case 'priview': {
+        //   this.$api.resource.getResourceDetailById(row.copyrightId).then((data) => {
+        //     Object.assign(this.publishModal, {
+        //       readonly: true,
+        //       data,
+        //       type: Operation.Publish,
+        //       visible: true
+        //     });
+        //   });
+        //   break;
+        // }
         case 'audit': {
           this.$api.copyright.audit(row.copyrightId).then(() => {
             this.$message({ message: '已审核', type: 'success' });
@@ -156,23 +181,37 @@ export default {
             data: Object.assign(getCopyRightPublishInitData(), {
               copyrightId: row.copyrightId,
             }),
+            readonly: false,
             type: Operation.Publish,
             visible: true
           });
           break;
         }
         case 'purchase': {
-          this.$api.user.purchasedResources.sell(row.tokenId, row.sellPrice).then(() => {
-            this.$message({ message: '发布出售成功', type: 'success' });
-            this.getList();
-          }).catch(this.$message);
+          this.$prompt('请输入出售价格', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            inputPattern: /\d+/,
+            inputErrorMessage: '请输入数字'
+          }).then(({ value }) => {
+            this.$api.user.purchasedResources.sell(row.tokenId, row.resourceId, value).then(() => {
+              this.$message({ message: '发布出售成功', type: 'success' });
+              this.getList();
+            }).catch(this.$message);
+          }).catch(() => {});
           break;
         }
         case 'rent': {
-          this.$api.user.purchasedResources.rentOut(row.tokenId, row.rentPrice).then(() => {
-            this.$message({ message: '发布出租成功', type: 'success' });
-            this.getList();
-          }).catch(this.$message);
+          Object.assign(this.rentModal, {
+            data: Object.assign(this.rentModal.data, {
+              copyrightId: row.copyrightId,
+              tokenId: row.tokenId,
+              rentPrice: '',
+              rentTime: ''
+            }),
+            type: Operation.Rent,
+            visible: true
+          });
           break;
         }
         default: 
@@ -195,6 +234,7 @@ export default {
         case Operation.Cancel: {
           this.resModal.visible = false;
           this.publishModal.visible = false;
+          this.rentModal.visible = false;
           break;
         }
         case Operation.Publish: {
@@ -202,6 +242,16 @@ export default {
             this.$message({ message: '发行成功', type: 'success' });
             this.getList();
           }).catch(this.$message);
+          break;
+        }
+        case Operation.Rent: {
+          const res = this.rentModal.data;
+          this.$api.user.purchasedResources
+            .rentOut(res.tokenId, res.resourceId, res.rentPrice, res.rentTime)
+            .then(() => {
+              this.$message({ message: '发布出租成功', type: 'success' });
+              this.getList();
+            }).catch(this.$message);
           break;
         }
         default: 

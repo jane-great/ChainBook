@@ -39,13 +39,13 @@ export const getTableHeader = (listType) => {
   }
 };
 export const getCopyRightApplyInitData = () => ({
-  workName: '测试新增版权',
+  workName: '',
   workCategory: '',
-  samplePath: [],
+  localUrl: [],
   authors: [{
-    authorName: 'zebin',
+    authorName: '',
     identityType: '身份证',
-    identityNum: '12345678'
+    identityNum: ''
   }],
   workProperty: '',
   rights: [],
@@ -56,6 +56,6 @@ export const getCopyRightPublishInitData = () => ({
   resourceName: '',
   total: '',
   coverImage: '',
-  // coverImage: 'http://159.203.96.61:3000/images/coverImage-ws3nlm1528896785295.jpg',
+  desc: '',
   price: ''
 });

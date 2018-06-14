@@ -1,5 +1,4 @@
 import axios from 'axios';
-import qs from 'qs';
 import { Loading } from 'element-ui';
 
 import baseAPI from 'src/apis/base';
@@ -21,11 +20,7 @@ function getRequestInstance() {
     // 给 config.url 添加上baseUrl
     config.url = `/ChainBook${config.url}`;
 
-    // 后端不支持 json 格式的 data，需要将 json 格式转为 x-www-form-urlencoded
-    if (typeof config.data === 'object' && !(config.data instanceof FormData)) {
-      config.data = qs.stringify(config.data);
-      Object.assign(headers, { 'Content-Type': 'application/x-www-form-urlencoded' });
-    }
+    Object.assign(headers, { 'Content-Type': 'application/json' });
 
     // 添加 csrftoken 和 _t
     // TODO 验证 POST 请求时 csrftoken 加在 params 中是否有效
@@ -51,7 +46,6 @@ function getRequestInstance() {
           window.location.href = '/upgrade.html';
         }
         return Promise.reject();
-      case 2001: // CSRF token 过期
       case -9999: // 登录超时
         return Promise.reject('登录超时，请刷新页面');
 

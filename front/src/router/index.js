@@ -38,7 +38,8 @@ export const routerMap = [
     path: '/User',
     name: 'User',
     component: User,
-    title: '个人管理'
+    title: '个人中心',
+    visible: false
   }
 ];
 

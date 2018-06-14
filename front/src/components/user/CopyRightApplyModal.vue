@@ -10,9 +10,9 @@
         </el-select>
       </el-form-item>
       <el-form-item label="作者信息" prop="authors">
-        <el-input v-model="data.authors[0].authorName" placeholder="名称"></el-input>
-        <el-input v-model="data.authors[0].identityType" placeholder="身份类型"></el-input>
-        <el-input v-model="data.authors[0].identityNum" placeholder="身份证"></el-input>
+        <el-input v-model="data.authors[0].authorName" placeholder="姓名"></el-input>
+        <!-- <el-input v-model="data.authors[0].identityType" placeholder="身份类型"></el-input> -->
+        <el-input v-model="data.authors[0].identityNum" placeholder="身份证号码"></el-input>
       </el-form-item>
       <el-form-item label="著作属性" prop="workProperty">
         <el-select v-model="data.workProperty" placeholder="下拉选择">

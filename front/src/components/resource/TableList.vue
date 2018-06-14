@@ -1,7 +1,7 @@
 <template>
   <div class="resource-table-list">
     <el-row :gutter="20">
-      <el-col :span="8" v-for="book in data" :key="book._id">
+      <el-col :span="8" v-for="book in data" v-show="data.length" :key="book._id">
         <section class="book-content">
           <div class="image">
             <img :src="book.coverImage" />
@@ -17,14 +17,14 @@
                 <el-button
                 size="mini"
                 :type="'text'"
-                @click="handleGetBookInfo">书籍详情
+                @click="handleGetBookInfo(book)">书籍详情
                 </el-button>
               </span>
               <span>
                 <el-button
                 size="mini"
                 :type="'text'"
-                @click="handleGetOwnerInfo">发布人
+                @click="handleGetOwnerInfo(book, true)">发布人
                 </el-button>
               </span>
               <span>
@@ -38,6 +38,7 @@
           </div>
         </section>
       </el-col>
+      <el-col :span="20" style="text-align: center;" v-show="!data.length">暂无数据</el-col>
     </el-row>
 
     <div class="pagination">
@@ -51,14 +52,28 @@
         :total="total">
       </el-pagination>
     </div>
+
+    <copy-right-publish-modal
+      :visible="publishModal.visible"
+      :data="publishModal.data"
+      :readonly="publishModal.readonly"
+      :type="publishModal.type"
+      :confirm-fn="handleModalButtonClick"
+      :cancel-fn="handleModalButtonClick">
+    </copy-right-publish-modal>
   </div>
 </template>
 <script>
 import { ListType } from 'src/config/resource/enum';
+import { Operation } from 'src/config/user/enum';
+import CopyRightPublishModal from 'src/components/user/CopyRightPublishModal';
 
 export default {
   props: {
     listType: String
+  },
+  components: {
+    CopyRightPublishModal
   },
   data() {
     return {
@@ -67,6 +82,11 @@ export default {
         page: 1,
         pageSize: 20,
         lastId: ''
+      },
+      publishModal: {
+        data: {},
+        visible: false,
+        type: null
       },
       data: '',
       total: 0
@@ -90,11 +110,16 @@ export default {
   },
   methods: {
     getList() {
-      this.$api.resource.getResourceListByPage(this.query).then((data) => {
+      const api = {
+        [ListType.FirstResource]: this.$api.resource.getResourceListByPage,
+        [ListType.SecondHand]: this.$api.resource.getPurchasedResourceListByPage,
+        [ListType.Rent]: this.$api.resource.getTenantableResourceListByPage
+      }[this.listType];
+      api(this.query).then((data) => {
         this.data = data.resourceInfoList;
         this.query.lastId = data.page.lastId;
         this.total = data.total;
-      });
+      }).catch(this.$message);
     },
     handleSizeChange(pageSize) {
       this.query.pageSize = pageSize;
@@ -105,29 +130,55 @@ export default {
       this.getList();
     },
 
-    handleGetBookInfo() {
-
-    },
-    handleGetOwnerInfo() {
-      this.getGetBookInfoFromApi().then((owner) => {
-        this.$alert(
-          `<p><span style="display: inline-block; width: 100px;">token_id</span>${owner.tokenId}</p>
-          <p><span style="display: inline-block; width: 100px;">发布人</span>${owner.ownerAccount}</p>
-          <p><span style="display: inline-block; width: 100px;">价格</span>${owner.purchasePrice}元</p>`, 
-          '交易人', {
-            dangerouslyUseHTMLString: true
-          }
-        );
+    handleGetBookInfo(book) {
+      this.$api.resource.getResourceDetailById(book._id).then((data) => {
+        Object.assign(this.publishModal, {
+          readonly: true,
+          data,
+          visible: true
+        });
       });
     },
-    getGetBookInfoFromApi() {
-      return new Promise((resolve) => {
-        const owner = {
-          tokenId: '5b175b0f08585480f53bce38',
-          ownerAccount: 'test',
-          purchasePrice: '10'
-        };
-        resolve(owner);
+    handleGetOwnerInfo(book, isShowOwnerModal) {
+      return new Promise((resolve, reject) => {
+        switch (this.listType) {
+          case ListType.SecondHand:
+          case ListType.FirstResource: {
+            this.$api.resource.getPurchasedResourceOwnerListById(book._id).then((owner) => {
+              if (isShowOwnerModal) {
+                this.$alert(
+                  `<p><span class="owner-info-item">token_id</span>${owner.tokenId}</p>
+                    <p><span class="owner-info-item">发布人</span>${owner.ownerAccount}</p>
+                    <p><span class="owner-info-item">售卖价格</span>${owner.purchasePrice}元</p>`, 
+                  '交易人', {
+                    dangerouslyUseHTMLString: true
+                  }
+                );
+              }
+              resolve(owner);
+            }).catch(reject);
+            break;
+          }
+          case ListType.Rent: {
+            this.$api.resource.getTenantableResourceOwnerListById(book._id).then((owner) => {
+              if (isShowOwnerModal) {
+                this.$alert(
+                  `<p><span class="owner-info-item">token_id</span>${owner.tokenId}</p>
+                    <p><span class="owner-info-item">发布人</span>${owner.ownerAccount}</p>
+                    <p><span class="owner-info-item">租赁价格</span>${owner.rentPrice}元</p>
+                    <p><span class="owner-info-item">租赁次数</span>${owner.rentTime}元</p>`, 
+                  '交易人', {
+                    dangerouslyUseHTMLString: true
+                  }
+                );
+              }
+              resolve(owner);
+            }).catch(reject);
+            break;
+          }
+          default:
+            break;
+        }
       });
     },
 
@@ -136,38 +187,46 @@ export default {
         resourceId: book._id,
         tokenId: ''
       };
-      this.getGetBookInfoFromApi().then((data) => {
-        sendData.tokenId = data.tokenId;
-        // tokenId是需要去对应的own
+      this.handleGetOwnerInfo(book, false).then((owner) => {
+        // tokenId是需要去对应的owner人
+        sendData.tokenId = owner.tokenId;
         switch (this.listType) {
           case ListType.FirstResource: 
             this.$api.resource.buyFromAuthor(sendData).then(() => {
               this.$message({ message: '购买成功', type: 'success' });
-              this.getList();
             }).catch(this.$message);
             break;
           case ListType.SecondHand:
             this.$api.resource.buy(sendData).then(() => {
               this.$message({ message: '购买成功', type: 'success' });
-              this.getList();
             }).catch(this.$message);
             break;
           case ListType.Rent: 
             this.$api.resource.rent(sendData).then(() => {
               this.$message({ message: '租赁成功', type: 'success' });
-              this.getList();
             }).catch(this.$message);
             break;
           default: 
             break;
         }
       });
+    },
+
+    handleModalButtonClick(operationType) {
+      switch (operationType) {
+        case Operation.Cancel: {
+          this.publishModal.visible = false;
+          break;
+        }
+        default: 
+          break;
+      }
     }
   }
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .resource-table-list{
   .el-row {
     margin-bottom: 20px;
@@ -205,6 +264,7 @@ export default {
         .desc {
           color: #676767;
           font-size: 14px;
+          height: 19px;
         }
         .detail {
           overflow: hidden;
@@ -224,5 +284,12 @@ export default {
     text-align: center;
   }
 }
+.el-message-box__message p {
+  .owner-info-item {
+    display: inline-block;
+    width: 100px;
+    padding: 10px 0;
+  }
+} 
 </style>
 

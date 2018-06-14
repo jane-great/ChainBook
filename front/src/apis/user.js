@@ -54,22 +54,22 @@ export default function (request) {
     },
     purchasedResources: {
       // 出售当前的已购买的图书
-      sell(tokenId, sellPrice) {
+      sell(tokenId, resourceId, sellPrice) {
         return request({
           url: '/user/purchasedResources/sell',
           method: 'post',
           data: {
-            tokenId, sellPrice
+            tokenId, resourceId, sellPrice
           }
         }).then(({ data }) => data);
       },
       // 租赁当前的已购买的图书
-      rentOut(tokenId, rentPrice) {
+      rentOut(tokenId, resourceId, rentPrice, rentTime) {
         return request({
           url: '/user/purchasedResource/rentOut',
           method: 'post',
           data: {
-            tokenId, rentPrice
+            tokenId, resourceId, rentPrice, rentTime
           }
         }).then(({ data }) => data);
       }

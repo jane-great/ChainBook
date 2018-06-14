@@ -64,7 +64,6 @@ export default {
   },
   data() {
     return {
-      navList: routerMap,
       loginModal: {
         visible: false,
         type: 1,
@@ -87,6 +86,12 @@ export default {
       const matchPath = this.navList.map(nav => nav.path).indexOf(this.path);
       if (matchPath > -1) return matchPath.toString();
       return '0';
+    },
+    navList() {
+      if (this.username) {
+        return routerMap;
+      } 
+      return routerMap.filter(nav => nav.visible !== false);
     }
   },
   methods: {
@@ -109,9 +114,14 @@ export default {
           email,
           mobile
         }).then(() => {
-          this.$message({ message: '注册成功', type: 'success' });
-          this.loginModal.visible = false;
-          this.getUsername(userName);
+          this.$api.user.localLogin({
+            userName,
+            pwd: pass
+          }).then(() => {
+            this.$message({ message: '注册成功', type: 'success' });
+            this.loginModal.visible = false;
+            this.getUsername(userName);
+          }).catch(this.$message);
         }).catch(this.$message);
       } else {
         this.$api.user.localLogin({
