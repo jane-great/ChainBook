@@ -144,7 +144,7 @@ export default function (request) {
     // 发行审核通过的版权
     publish(data) {
       return request({
-        url: 'copyrightId',
+        url: '/resource/publish',
         method: 'post',
         data
       }).then(data => data);

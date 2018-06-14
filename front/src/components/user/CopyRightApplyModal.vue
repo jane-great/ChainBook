@@ -41,12 +41,10 @@
           ref="upload"
           name="sample"
           action="/ChainBook/copyright/upload/sample"
-          header="{ 'Content-Type': 'multipart/form-data;' }"
           :on-success="handleUpdateSuccess"
-          :file-list="data.samplePath">
+          :file-list="data.localUrl">
           <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-          <!-- <el-button style="margin-left: 10px; display: none;" size="small" type="success" @click="submitUpload">上传到服务器</el-button> -->
-          <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
+          <div slot="tip" class="el-upload__tip">只能上传doc .pdf .txt文件</div>
         </el-upload>
       </el-form-item>
     </el-form>
@@ -99,8 +97,11 @@ export default {
         return false;
       });
     },
-    handleUpdateSuccess(callback, file, fileList) {
-      console.log(callback, file, fileList);
+    handleUpdateSuccess(callback, file) {
+      this.data.localUrl = [{
+        name: file.name,
+        url: callback.data.path
+      }];
     }
   }
 };

@@ -27,13 +27,21 @@ export default function (request) {
         data: file
       }).then(data => data);
     },
-    // 发行审核通过的版权信息
-    publish(data) {
+    // 手动审核
+    audit(copyrightId) {
       return request({
-        url: '/resource/publish',
+        url: '/copyright/audit',
         method: 'post',
-        data
+        data: { copyrightId }
       }).then(data => data);
     }
+    // // 发行审核通过的版权信息
+    // publish(data) {
+    //   return request({
+    //     url: '/resource/publish',
+    //     method: 'post',
+    //     data
+    //   }).then(data => data);
+    // }
   };
 }

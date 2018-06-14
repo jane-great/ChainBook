@@ -19,9 +19,9 @@ export const getTableHeader = (listType) => {
         { field: 'resourceName', name: '名称', width: 120 },
         { field: 'type', name: '类型', width: 40 },
         { field: 'tokenId', name: 'tokenId', width: 120 },
-        { field: 'sellStatus', name: '出售状态', width: 60 },
+        { field: '__sellStatus', name: '出售状态', width: 60 },
         { field: 'sellPrice', name: '出售价格', width: 60 },
-        { field: 'rentOutStatus', name: '租赁状态', width: 60 },
+        { field: '__rentOutStatus', name: '租赁状态', width: 60 },
         { field: 'rentPrice', name: '租赁价格', width: 60 }
       ];
     }
@@ -41,10 +41,7 @@ export const getTableHeader = (listType) => {
 export const getCopyRightApplyInitData = () => ({
   workName: '测试新增版权',
   workCategory: '',
-  samplePath: [{
-    name: 'test',
-    url: 'local/file/sample-xv20s51528202601031.doc'
-  }],
+  samplePath: [],
   authors: [{
     authorName: 'zebin',
     identityType: '身份证',

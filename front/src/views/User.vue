@@ -51,7 +51,7 @@ export default {
   data() {
     return {
       listType: ListType.CopyRight,
-      dataList: getApiToRow(ListType.CopyRight),
+      dataList: [],
       resModal: {
         data: getCopyRightApplyInitData(),
         visible: false,
@@ -74,6 +74,10 @@ export default {
       switch (this.listType) {
         case ListType.CopyRight: {
           return [{
+            label: '审核',
+            name: 'audit',
+            type: 'text'
+          }, {
             label: '发行',
             name: 'publish',
             type: 'text'
@@ -110,13 +114,24 @@ export default {
       return getTableHeader(this.listType);
     }
   },
+  mounted() {
+    this.getList();
+  },
   methods: {
     getList() {
+      const api = {
+        [ListType.CopyRight]: this.$api.user.getCopyRightsByUser,
+        [ListType.Purchase]: this.$api.user.getPurchasedResourcesByUser,
+        [ListType.Rent]: this.$api.user.getRentResourcesByUser
+      }[this.listType];
+      api().then((data) => {
+        this.dataList = getApiToRow(this.listType, data);
+      });
     },
 
     handleChangeTab(tab) {
       this.listType = tab.name;
-      this.dataList = getApiToRow(this.listType);
+      this.getList();
     },
     
     handleCreateCopyRight() {
@@ -129,11 +144,14 @@ export default {
 
     handleButtonClick(index, row, name) {
       switch (name) {
+        case 'audit': {
+          this.$api.copyright.audit(row.copyrightId).then(() => {
+            this.$message({ message: '已审核', type: 'success' });
+            this.getList();
+          }).catch(this.$message);
+          break;
+        }
         case 'publish': {
-          // this.$api.copyright.publish(row).then(() => {
-          //   this.$message({ message: '发行成功', type: 'success' });
-          //   this.getList();
-          // }).catch(this.$message);
           Object.assign(this.publishModal, {
             data: Object.assign(getCopyRightPublishInitData(), {
               copyrightId: row.copyrightId,
@@ -170,6 +188,7 @@ export default {
           this.$api.copyright.apply(sendData).then(() => {
             this.$message({ message: '申请成功', type: 'success' });
             this.resModal.visible = false;
+            this.getList();
           }).catch(this.$message);
           break;
         }
@@ -179,7 +198,7 @@ export default {
           break;
         }
         case Operation.Publish: {
-          this.$api.copyright.publish(this.publishModal.data).then(() => {
+          this.$api.resource.publish(this.publishModal.data).then(() => {
             this.$message({ message: '发行成功', type: 'success' });
             this.getList();
           }).catch(this.$message);

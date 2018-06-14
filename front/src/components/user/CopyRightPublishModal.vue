@@ -109,7 +109,7 @@ export default {
   }
   .avatar {
     width: 178px;
-    height: 178px;
+    min-height: 178px;
     display: block;
   }
 }

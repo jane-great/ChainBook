@@ -36,21 +36,21 @@ export default function (request) {
       return request({
         url: '/user/getCopyRightsByUser',
         method: 'get'
-      }).then(data => data);
+      }).then(({ data }) => data);
     },
     // 获取当前用户购买资源列表
     getPurchasedResourcesByUser() {
       return request({
         url: '/user/getPurchasedResourcesByUser',
         method: 'get'
-      }).then(data => data);
+      }).then(({ data }) => data);
     },
     // 获取当前用户租赁资源列表
     getRentResourcesByUser() {
       return request({
         url: '/user/getRentResourcesByUser',
         method: 'get'
-      }).then(data => data);
+      }).then(({ data }) => data);
     },
     purchasedResources: {
       // 出售当前的已购买的图书
@@ -61,7 +61,7 @@ export default function (request) {
           data: {
             tokenId, sellPrice
           }
-        }).then(data => data);
+        }).then(({ data }) => data);
       },
       // 租赁当前的已购买的图书
       rentOut(tokenId, rentPrice) {
@@ -71,7 +71,7 @@ export default function (request) {
           data: {
             tokenId, rentPrice
           }
-        }).then(data => data);
+        }).then(({ data }) => data);
       }
     }
   };
