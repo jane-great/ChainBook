@@ -1,55 +1,95 @@
 <template>
   <div>
-    <!-- <el-row :gutter="20">
-      <el-col :span="16">
-        <div class="grid-content bg-purple">
-          <el-tabs v-model="activeBuyTab" type="card" @tab-click="handleClick">
-            <el-tab-pane label="10元区" name="10">10元区</el-tab-pane>
-            <el-tab-pane label="20元区" name="20">20元区</el-tab-pane>
-            <el-tab-pane label="30元区" name="30">30元区</el-tab-pane>
-            <el-tab-pane label="40元区" name="40">40元区</el-tab-pane>
-          </el-tabs>
-        </div>
+    <el-carousel :interval="4000" type="card" height="400px">
+      <el-carousel-item v-for="item in firstResourceList" :key="item._id">
+        <img :src="item.coverImage" class="image" />
+        <p class="book-name">{{ item.resourceName }}</p>
+      </el-carousel-item>
+    </el-carousel>
+    <el-row :gutter="20" class="">
+      <el-col :span="12">
+        <el-card class="box-card" shadow="never">
+          <div slot="header" class="clearfix">
+            <span class="sub-header">二手市场</span>
+            <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
+          </div>
+          <div v-for="item in secondHandList" :key="item._id" class="text item">
+            {{ item.resourceName }}
+          </div>
+        </el-card>
       </el-col>
-      <el-col :span="8">
-        <div class="grid-content bg-purple">
-          购买热门
-        </div>
+      <el-col :span="12">
+        <el-card class="box-card" shadow="never">
+          <div slot="header" class="clearfix">
+            <span class="sub-header">租赁市场</span>
+            <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
+          </div>
+          <div v-for="item in rentList" :key="item._id" class="text item">
+            {{ item.resourceName }}
+          </div>
+        </el-card>
       </el-col>
     </el-row>
-    
-    <el-row :gutter="20">
-      <el-col :span="16">
-        <div class="grid-content bg-purple">
-          <el-tabs v-model="activeBuyTab" type="card" @tab-click="handleClick">
-            <el-tab-pane label="10元区" name="10">10元区</el-tab-pane>
-            <el-tab-pane label="20元区" name="20">20元区</el-tab-pane>
-            <el-tab-pane label="30元区" name="30">30元区</el-tab-pane>
-            <el-tab-pane label="40元区" name="40">40元区</el-tab-pane>
-          </el-tabs>
-        </div>
-      </el-col>
-      <el-col :span="8">
-        <div class="grid-content bg-purple">
-          二手热门
-        </div>
-      </el-col>
-    </el-row> -->
-    待开发
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
-      activeBuyTab: '10'
+      firstResourceList: [],
+      secondHandList: [],
+      rentList: []
+    }
+  },
+  mounted() {
+    const query = {
+      page: 1,
+      pageSize: 5,
+      lastId: ''
     };
+    Promise.all([
+      this.$api.resource.getResourceListByPage(query),
+      this.$api.resource.getPurchasedResourceListByPage(query),
+      this.$api.resource.getTenantableResourceListByPage(query)
+    ]).then(([firstResource, secondHand, rent]) => {
+      this.firstResourceList = firstResource.resourceInfoList;
+      this.secondHandList = secondHand.resourceInfoList;
+      this.rentList = rent.resourceInfoList;
+    });
   },
   methods: {
-    handleClick() {
-      // console.log(tab, event);
-    }
+
   }
-};
+}
 </script>
 
+<style lang="scss">
+.el-carousel__item {
+  h3 {
+    color: #475669;
+    font-size: 14px;
+    opacity: 0.75;
+    line-height: 400px;
+    margin: 0;
+  }
+  .image {
+    height: 90%;
+    display: block;
+    margin: 0 auto;
+  }
+  .book-name {
+    text-align: center;
+  }
+}
+.box-card {
+  .sub-header {
+    font-weight: bold;
+  }
+}
+.el-carousel__item:nth-child(2n) {
+  // background-color: #99a9bf;
+}
+.el-carousel__item:nth-child(2n+1) {
+  // background-color: #d3dce6;
+}
+</style>

@@ -204,7 +204,7 @@ export default {
         case 'rent': {
           Object.assign(this.rentModal, {
             data: Object.assign(this.rentModal.data, {
-              copyrightId: row.copyrightId,
+              resourceId: row.resourceId,
               tokenId: row.tokenId,
               rentPrice: '',
               rentTime: ''
