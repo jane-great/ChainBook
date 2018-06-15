@@ -56,6 +56,7 @@
 import LoginModal from 'components/login/LoginModal';
 import { mapState, mapActions } from 'vuex';
 import { routerMap } from 'src/router';
+import md5 from 'js-md5';
 
 export default {
   name: 'App',
@@ -68,11 +69,11 @@ export default {
         visible: false,
         type: 1,
         data: {
-          userName: 'zebin',
-          pass: '888888',
-          checkPass: '888888',
-          mobile: '18825182349',
-          email: '1069467662@qq.com'
+          userName: '',
+          pass: '',
+          checkPass: '',
+          mobile: '',
+          email: ''
         }
       }
     };
@@ -101,22 +102,30 @@ export default {
     handleOpenLoginModal(type) {
       Object.assign(this.loginModal, {
         visible: true,
-        type
+        type,
+        data: {
+          userName: '',
+          pass: '',
+          checkPass: '',
+          mobile: '',
+          email: ''
+        }
       });
     },
     handleLoginConfirm() {
       const { userName, pass, email, mobile } = this.loginModal.data;
+      const passwordForMd5 = md5(pass);
       // 注册
       if (this.loginModal.type === 1) {
         this.$api.user.register({
           userName,
-          pwd: pass,
+          pwd: passwordForMd5,
           email,
           mobile
         }).then(() => {
           this.$api.user.localLogin({
             userName,
-            pwd: pass
+            pwd: passwordForMd5
           }).then(() => {
             this.$message({ message: '注册成功', type: 'success' });
             this.loginModal.visible = false;
@@ -126,7 +135,7 @@ export default {
       } else {
         this.$api.user.localLogin({
           userName,
-          pwd: pass
+          pwd: passwordForMd5
         }).then(() => {
           this.$message({ message: '登录成功', type: 'success' });
           this.loginModal.visible = false;
@@ -203,10 +212,11 @@ body {
   margin: 0 auto;
   width: 1200px;
   margin-top: 15px;
-  min-height: 750px;
+  min-height: 730px;
 }
 .footer {
   margin: 0 auto; 
+  padding-top: 15px;
 	height: 70px; 
 	width: 1200px;
 	text-align: center;

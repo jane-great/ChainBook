@@ -225,9 +225,9 @@ export default {
         case Operation.Update: {
           const sendData = getResToApi(this.resModal.data);
           this.$api.copyright.apply(sendData).then(() => {
-            this.$message({ message: '申请成功', type: 'success' });
             this.resModal.visible = false;
             this.getList();
+            this.$message({ message: '申请成功', type: 'success' });
           }).catch(this.$message);
           break;
         }
@@ -239,8 +239,9 @@ export default {
         }
         case Operation.Publish: {
           this.$api.resource.publish(this.publishModal.data).then(() => {
-            this.$message({ message: '发行成功', type: 'success' });
+            this.publishModal.visible = false;
             this.getList();
+            this.$message({ message: '发行成功', type: 'success' });
           }).catch(this.$message);
           break;
         }
@@ -249,8 +250,9 @@ export default {
           this.$api.user.purchasedResources
             .rentOut(res.tokenId, res.resourceId, res.rentPrice, res.rentTime)
             .then(() => {
-              this.$message({ message: '发布出租成功', type: 'success' });
+              this.rentModal.visible = false;
               this.getList();
+              this.$message({ message: '发布出租成功', type: 'success' });
             }).catch(this.$message);
           break;
         }
