@@ -148,7 +148,6 @@ export default {
               if (isShowOwnerModal) {
                 this.$alert(
                   `<p><span class="owner-info-item">token_id</span>${owner.tokenId}</p>
-                    <p><span class="owner-info-item">发布人</span>${owner.ownerAccount}</p>
                     <p><span class="owner-info-item">售卖价格</span>${owner.sellPrice}元</p>`, 
                   '交易人', {
                     dangerouslyUseHTMLString: true
@@ -164,7 +163,6 @@ export default {
               if (isShowOwnerModal) {
                 this.$alert(
                   `<p><span class="owner-info-item">token_id</span>${owner.tokenId}</p>
-                    <p><span class="owner-info-item">发布人</span>${owner.ownerAccount}</p>
                     <p><span class="owner-info-item">租赁价格</span>${owner.rentPrice}元</p>
                     <p><span class="owner-info-item">可租赁天数</span>${owner.rentTime}天</p>`, 
                   '交易人', {
@@ -265,6 +263,9 @@ export default {
           color: #676767;
           font-size: 14px;
           height: 19px;
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
         }
         .detail {
           overflow: hidden;

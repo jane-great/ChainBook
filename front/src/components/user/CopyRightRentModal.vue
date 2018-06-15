@@ -5,7 +5,7 @@
         <el-input v-model.number="data.rentPrice" placeholder="租赁价格"></el-input>
       </el-form-item>
       <el-form-item label="时间（天）">
-        <el-input v-model.number="data.rentTime" placeholder="租赁价格"></el-input>
+        <el-input v-model.number="data.rentTime" placeholder="租赁时间"></el-input>
       </el-form-item>
       </el-form-item>
     </el-form>

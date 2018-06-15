@@ -2,10 +2,10 @@
   <el-dialog :title="dialogTitle" :visible="visible" :show-close="false" :width="'500px'">
     <el-form :model="data" status-icon :rules="rules" ref="form" label-width="100px" class="register">
       <el-form-item label="账号" prop="username">
-        <el-input v-model.number="data.userName"></el-input>
+        <el-input v-model="data.userName"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="pass">
-        <el-input type="password" v-model="data.pass" auto-complete="off"></el-input>
+        <el-input type="password" v-model="data.pass"></el-input>
       </el-form-item>
       <template v-if="type === 1">
         <el-form-item label="确认密码" prop="checkPass">

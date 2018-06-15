@@ -2,7 +2,7 @@
   <el-dialog :title="readonly ? '预览发行版权' : '发行版权'" :visible="visible" :show-close="false" class="copy-right-publish-modal" :width="'700px'">
     <el-form v-if="!readonly" :model="data" status-icon :rules="rules" ref="form" label-width="100px" class="register">
       <el-form-item label="名称" prop="resourceName">
-        <el-input v-model.number="data.resourceName" placeholder="名称"></el-input>
+        <el-input v-model="data.resourceName" placeholder="名称"></el-input>
       </el-form-item>
       <el-form-item label="发行总数">
         <el-input v-model.number="data.total" placeholder="发行总数"></el-input>
