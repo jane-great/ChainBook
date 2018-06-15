@@ -9,7 +9,7 @@
           <div class="intro">
             <p>
               <span class="name">{{ book.resourceName }}</span>
-              <span class="price">{{ book.price }} 元</span>
+              <span class="price" v-show="listType === ListType.FirstResource">{{ book.price }} 元</span>
             </p>
             <p class="desc">{{ book.desc }}</p>
             <div class="detail">
@@ -22,6 +22,7 @@
               </span>
               <span>
                 <el-button
+                v-show="listType !== ListType.FirstResource"
                 size="mini"
                 :type="'text'"
                 @click="handleGetOwnerInfo(book, true)">交易详情
@@ -89,7 +90,8 @@ export default {
         type: null
       },
       data: '',
-      total: 0
+      total: 0,
+      ListType
     };
   },
   computed: {
