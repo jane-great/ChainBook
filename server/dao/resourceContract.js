@@ -75,8 +75,6 @@ const ResourceContractDao = class dao {
     return new Promise((resolve, reject) => {
       //获取合约的代码，部署时传递的就是合约编译后的二进制码,
       let deployCode = dao.bookOwnerShipCompiled.bytecode;
-      //获取部署该合约预估的费用
-      let gasEstimate = dao.bookOwnerShipContactWeb3.estimateGas({data:deployCode});
       dao.bookOwnerShipContactWeb3.new(copyrightDao.getCopyrightContractAddress(),parseInt(resourceObj.copyrightAddress),parseInt(resourceObj.price),resourceObj.total,limit,{
         data: deployCode,
         from: userObj.account,
