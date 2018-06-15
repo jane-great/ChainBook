@@ -51,9 +51,9 @@ contract("BookOwnerShip",  function(accounts) {
     })
 
     it("作者修改价格", async () => {
-      await instance.setPrice(1000, {from: accounts[0]});
+      await instance.setPrice(web3.toWei(1,'ether'), {from: accounts[0]});
       let price = await instance.getPrice();
-      assert.equal(price.toNumber(), 1000, "修改后的价格为1000wei");
+      assert.equal(price.toNumber(), web3.toWei(1,'ether'), "修改后的价格为1000wei");
     })
 
     it("不是作者，不能修改价格", async () => {
@@ -61,7 +61,7 @@ contract("BookOwnerShip",  function(accounts) {
         assert(error.message.indexOf('revert') >= 0, "error message must contain revert");
       })
       let price = await instance.getPrice();
-      assert.equal(price.toNumber(), 1000, "价格为1000wei");
+      assert.equal(price.toNumber(), web3.toWei(1,'ether'), "价格为1000wei");
     })
 
     it("作者更新作者地址", async () => {
@@ -89,9 +89,15 @@ contract("BookOwnerShip",  function(accounts) {
     })
 
     it("购买价格足够，购买成功", async () => {
-      await instance.buyFromAuthor({from:accounts[2], value:1001});
+      let balance02 = web3.fromWei(web3.eth.getBalance(accounts[2]).toNumber(),'ether');
+      let balance05 = web3.fromWei(web3.eth.getBalance(accounts[5]).toNumber(),'ether');
+      await instance.buyFromAuthor({from:accounts[2], value:web3.toWei(3,'ether')});
+      let balance12 = web3.fromWei(web3.eth.getBalance(accounts[2]).toNumber(),'ether');
+      let balance15 = web3.fromWei(web3.eth.getBalance(accounts[5]).toNumber(),'ether');
+      assert.equal(balance15>balance05,true,"作者收到转账");
+      assert.equal(balance02-1>balance12,true,"买家收到退款");
       let num = await instance.publishedAmount();
-      assert.equal(num.toNumber(), 3, "已经发现3本书");
+      assert.equal(num.toNumber(), 3, "已经发行3本书");
       let addr = await instance.ownerOf(2)
       assert.equal(addr, accounts[2], "第三个账户拥有第三本图书");
       let res = await instance.allowToRead(accounts[2], 2);

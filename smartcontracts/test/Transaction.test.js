@@ -215,7 +215,7 @@ contract("Transaction", function(accounts) {
   it("租赁图书", async () => {
     // 重新出售图书
     await book.approve(trans.address, 0, {from:accounts[2]});
-    await trans.rent(book.address, 0, 10000, 2, {from:accounts[2]});
+    await trans.rent(book.address, 0, web3.toWei(1,'ether'), 2, {from:accounts[2]});
 
     // 金额不够，租赁失败
     await trans.lease(book.address, 0, {from:accounts[1], value:1000}).then(assert.fail).catch(function(error) {
@@ -226,8 +226,9 @@ contract("Transaction", function(accounts) {
     let leaser = await book.tokenIdToLeaser(0);
     assert.equal(leaser, 0, "无人租赁");
 
+
     // 金钱足够，租赁成功
-    await trans.lease(book.address, 0, {from:accounts[1], value:10000});
+    await trans.lease(book.address, 0, {from:accounts[1], value:web3.toWei(3,'ether')});
     let allowRead2 = await book.allowToRead(accounts[1],0);
     assert.equal(allowRead2, true, "允许账户1阅读");
     let allowRead3 = await book.allowToRead(accounts[2],0);
@@ -246,6 +247,15 @@ contract("Transaction", function(accounts) {
     })
   })
 
-
+  it("提款成功", async () => {
+    let balance02 = web3.fromWei(web3.eth.getBalance(accounts[2]).toNumber(),'ether');
+    await trans.withdraw({from:accounts[2]});
+    let balance12 = web3.fromWei(web3.eth.getBalance(accounts[2]).toNumber(),'ether');
+    assert.equal(balance12 > balance02 + web3.toWei(0.5,'ether'), true, "转账成功");
+    let balance01 = web3.fromWei(web3.eth.getBalance(accounts[1]).toNumber(),'ether');
+    await trans.withdraw({from:accounts[1]});
+    let balance11 = web3.fromWei(web3.eth.getBalance(accounts[1]).toNumber(),'ether');
+    assert.equal(balance11 > balance01 + web3.toWei(0.5,'ether'), true, "转账成功");
+  })
 
 })
