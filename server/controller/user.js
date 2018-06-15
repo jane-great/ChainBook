@@ -12,6 +12,8 @@ const config = require("../config");
 const preSellStatus = 1;
 const preRentStatus = 1;
 
+var userCount = 0;
+
 /**
  * 登录
  * @param req
@@ -62,13 +64,19 @@ exports.logout = async function(req, res, next) {
 exports.register = async function(req, res, next) {
   logger.info("register user");
   let random = encrypt.getRandom();
+  //TODO 临时加的控制demo的注册
+  if(userCount >=9){
+    logger.error("user account limit",userCount);
+    res.send({status:0,msg:"注册失败"});
+    return;
+  }
   let user = {
     userName:req.body.userName,
     pwd:encrypt.getMD5(req.body.pwd,random),
     email:req.body.email,
     mobile:req.body.mobile,
     randomNum:random,
-    account:config.server.userAccount
+    account:config.server.userAccount[userCount++] //TODO 对接钱包注册地址，获得真实的地址。
   }
   
   //TODO 校验注册的基本内容

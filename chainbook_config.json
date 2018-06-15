@@ -24,7 +24,16 @@
     "rentAndLease_source":"./smartcontracts/contracts/RentAndLease.sol",
     "contract_path":"./smartcontracts/contracts/",
     "address":"0x192Aa6873a4B8DAf59Fd0aDe090878d250d1dAeD",
-    "userAccount":"0x7cF2baAe306B1B0476843De3909097be0E6850f3",
+    "userAccount":[
+      "0x7cF2baAe306B1B0476843De3909097be0E6850f3",
+      "0xdb90a39821524394F2Fa8D8Adb752d2eFAdfF162",
+      "0x48B8c5386D63f481fD7E3aE425AB721F7389622F",
+      "0xF71D7785655abD77AAe4BC27602b19271535c329",
+      "0x165A27C8aE385f03BFC7A244a44460a5e9AC6f4c",
+      "0x162d47e51ee93Ec85bd2efDB17d9Dd596bEF9888",
+      "0x04C7eCfeD567eB1efE7eFb7Db38fa62b74Dbfb2a",
+      "0xbBED87f954CC28Ec37Efc9938f47EAAf7Bd969E4",
+      "0x30C7D698Ca96E04d88dcF61a698bEF9482Fdc597"],
     "bookOwnership_limit":2,
     "gas":1500000
   },
