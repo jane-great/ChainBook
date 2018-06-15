@@ -4,13 +4,13 @@ export const getTableHeader = (listType) => {
   switch (listType) {
     case ListType.CopyRight: {
       return [
-        { field: 'copyrightId', name: '版权ID' }, 
-        { field: 'workName', name: '版权名称' }, 
-        { field: 'copyrightAddress', name: '版权合约地址' }, 
-        { field: 'resourceAddress', name: '资源合约地址' }, 
-        { field: 'resourcesIpfsHash', name: '资源ipfsHash', hidden: true }, 
-        { field: 'resourcesIpfsDHash', name: '资源ipfsDHash', hidden: true }, 
-        { field: 'localUrl', name: '本地URL', hidden: true }
+        { field: 'copyrightId', name: '版权ID', width: 120 }, 
+        { field: 'workName', name: '版权名称', width: 120 }, 
+        { field: 'copyrightAddress', name: '版权合约地址', width: 120 }, 
+        { field: 'resourceAddress', name: '资源合约地址', width: 120 }, 
+        { field: 'resourcesIpfsHash', name: '资源ipfsHash', hidden: true, width: 120 }, 
+        { field: 'resourcesIpfsDHash', name: '资源ipfsDHash', hidden: true, width: 120 }, 
+        { field: 'localUrl', name: '本地URL', hidden: true, width: 120 }
       ];
     }
     case ListType.Purchase: {
@@ -20,9 +20,9 @@ export const getTableHeader = (listType) => {
         { field: 'type', name: '类型', width: 40 },
         { field: 'tokenId', name: 'tokenId', width: 120, hidden: true },
         { field: '__sellStatus', name: '出售状态', width: 60 },
-        { field: 'sellPrice', name: '出售价格', width: 60 },
+        { field: 'sellPrice', name: '出售价格(元)', width: 60 },
         { field: '__rentOutStatus', name: '租赁状态', width: 60 },
-        { field: 'rentPrice', name: '租赁价格', width: 60 }
+        { field: 'rentPrice', name: '租赁价格(元)', width: 60 }
       ];
     }
     case ListType.Rent: {
@@ -31,7 +31,7 @@ export const getTableHeader = (listType) => {
         { field: 'resourceName', name: '名称', width: 120 },
         { field: 'type', name: '类型', width: 40 },
         { field: 'tokenId', name: 'tokenId', width: 120 },
-        { field: 'rentTime', name: '出售时间', width: 80 }
+        { field: 'rentTime', name: '出售时间(天)', width: 80 }
       ];
     }
     default:

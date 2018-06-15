@@ -83,5 +83,8 @@ export default {
   .sub-header {
     font-weight: bold;
   }
+  .item {
+    margin-bottom: 10px;
+  }
 }
 </style>

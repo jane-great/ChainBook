@@ -68,11 +68,11 @@ export default {
         visible: false,
         type: 1,
         data: {
-          userName: 'zebin',
-          pass: '888888',
-          checkPass: '888888',
-          mobile: '18825182349',
-          email: '1069467662@qq.com'
+          userName: '',
+          pass: '',
+          checkPass: '',
+          mobile: '',
+          email: ''
         }
       }
     };
@@ -101,7 +101,14 @@ export default {
     handleOpenLoginModal(type) {
       Object.assign(this.loginModal, {
         visible: true,
-        type
+        type,
+        data: {
+          userName: '',
+          pass: '',
+          checkPass: '',
+          mobile: '',
+          email: ''
+        }
       });
     },
     handleLoginConfirm() {
@@ -203,10 +210,11 @@ body {
   margin: 0 auto;
   width: 1200px;
   margin-top: 15px;
-  min-height: 750px;
+  min-height: 730px;
 }
 .footer {
   margin: 0 auto; 
+  padding-top: 15px;
 	height: 70px; 
 	width: 1200px;
 	text-align: center;
