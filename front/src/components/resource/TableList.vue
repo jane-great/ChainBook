@@ -24,7 +24,7 @@
                 <el-button
                 size="mini"
                 :type="'text'"
-                @click="handleGetOwnerInfo(book, true)">发布人
+                @click="handleGetOwnerInfo(book, true)">交易详情
                 </el-button>
               </span>
               <span>
@@ -149,11 +149,11 @@ export default {
                 this.$alert(
                   `<p><span class="owner-info-item">token_id</span>${owner.tokenId}</p>
                     <p><span class="owner-info-item">发布人</span>${owner.ownerAccount}</p>
-                    <p><span class="owner-info-item">售卖价格</span>${owner.purchasePrice}元</p>`, 
+                    <p><span class="owner-info-item">售卖价格</span>${owner.sellPrice}元</p>`, 
                   '交易人', {
                     dangerouslyUseHTMLString: true
                   }
-                );
+                ).catch(() => {});
               }
               resolve(owner);
             }).catch(reject);
@@ -166,11 +166,11 @@ export default {
                   `<p><span class="owner-info-item">token_id</span>${owner.tokenId}</p>
                     <p><span class="owner-info-item">发布人</span>${owner.ownerAccount}</p>
                     <p><span class="owner-info-item">租赁价格</span>${owner.rentPrice}元</p>
-                    <p><span class="owner-info-item">租赁次数</span>${owner.rentTime}元</p>`, 
+                    <p><span class="owner-info-item">可租赁天数</span>${owner.rentTime}天</p>`, 
                   '交易人', {
                     dangerouslyUseHTMLString: true
                   }
-                );
+                ).catch(() => {});
               }
               resolve(owner);
             }).catch(reject);
@@ -192,7 +192,7 @@ export default {
         sendData.tokenId = owner.tokenId;
         switch (this.listType) {
           case ListType.FirstResource: 
-            this.$api.resource.buyFromAuthor(sendData).then(() => {
+            this.$api.resource.buyFromAuthor(book._id).then(() => {
               this.$message({ message: '购买成功', type: 'success' });
             }).catch(this.$message);
             break;
@@ -284,12 +284,16 @@ export default {
     text-align: center;
   }
 }
-.el-message-box__message p {
-  .owner-info-item {
-    display: inline-block;
-    width: 100px;
-    padding: 10px 0;
-  }
-} 
+.el-message-box {
+  width: 500px;
+  .el-message-box__message p {
+    .owner-info-item {
+      display: inline-block;
+      width: 100px;
+      padding: 10px 0;
+    }
+  } 
+}
+
 </style>
 
