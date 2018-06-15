@@ -149,7 +149,7 @@ export default {
                 this.$alert(
                   `<p><span class="owner-info-item">token_id</span>${owner.tokenId}</p>
                     <p><span class="owner-info-item">售卖价格</span>${owner.sellPrice}元</p>`, 
-                  '交易人', {
+                  '交易详情', {
                     dangerouslyUseHTMLString: true
                   }
                 ).catch(() => {});
@@ -165,7 +165,7 @@ export default {
                   `<p><span class="owner-info-item">token_id</span>${owner.tokenId}</p>
                     <p><span class="owner-info-item">租赁价格</span>${owner.rentPrice}元</p>
                     <p><span class="owner-info-item">可租赁天数</span>${owner.rentTime}天</p>`, 
-                  '交易人', {
+                  '交易详情', {
                     dangerouslyUseHTMLString: true
                   }
                 ).catch(() => {});
