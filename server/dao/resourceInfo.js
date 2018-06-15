@@ -317,7 +317,7 @@ ResourceInfoDao.prototype.addRentOutResourceById= function(id,rentOutResourceObj
 ResourceInfoDao.prototype.findSellResourceOwner = function(id,tokenId){
   try{
     return new Promise((resolve, reject) => {
-      ResourceInfo.find({_id:id,"sellResources.tokenId":tokenId},{"resourceName":1,"sellResources.$":1},function(err,list) {
+      ResourceInfo.find({_id:id,"sellResources.tokenId":tokenId},{"resourceName":1,"resourceAddress":1,"sellResources.$":1},function(err,list) {
         if(err){
           reject(err);
         } else {
@@ -342,7 +342,7 @@ ResourceInfoDao.prototype.findSellResourceOwner = function(id,tokenId){
 ResourceInfoDao.prototype.findTenantableResourceOwner = function(id,tokenId){
   try{
     return new Promise((resolve, reject) => {
-      ResourceInfo.find({_id:id,"tenantableResources.tokenId":tokenId},{"resourceName":1,"tenantableResources.$":1},function(err,list) {
+      ResourceInfo.find({_id:id,"tenantableResources.tokenId":tokenId},{"resourceName":1,"resourceAddress":1,"tenantableResources.$":1},function(err,list) {
         if(err){
           reject(err);
         } else {

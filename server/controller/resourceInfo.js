@@ -4,7 +4,7 @@ var userDao = require("../dao/user");
 var resourceInfoDao = require("../dao/resourceInfo");
 var resourceCopyrightDao = require("../dao/resourceCopyright");
 var resourceContractDao = require("../dao/resourceContract");
-const transactionContractDao = require("../dao/transactionContract");
+var transactionContractDao = require("../dao/transactionContract");
 const objectUtils = require("../utils/objectUtils");
 const localUpload = require("../component/localUpload");
 const config = require("../config");
@@ -122,9 +122,7 @@ exports.buyFromAuthor = async function(req, res, next){
       res.send({status:0,msg:"该资源已不可售"});
     }
     //需要时考虑一下事务
-    //TODO 调用资源合约的向作者购买的方法
-    //TODO 转账
-    let tokenId = "test tokenId";
+    let tokenId = await resourceContractDao.buyFromAuthor(resourceInfo.resourceAddress,user,resourceInfo.price);
     //合约购买成功后会回调登记用户的已购买
     let purchasedResource = userDao.buildEmptyPurchasedResource();
     purchasedResource.tokenId = tokenId;
@@ -170,8 +168,10 @@ exports.buy = async function (req, res, next) {
       return;
     }
     //2.调用交易合约的购买方法，合约里转移所有权
-    let isSuccess = transactionContractDao.buy(tokenId,sellResource.transactionAddress,userAccount,sellResource.ownerAccount);
-    if(!isSuccess){
+    let transactionHash =  transactionContractDao.buy(userAccount,sellResource.sellPrice,sellResourceDoc[0].resourceAddress,parseInt(tokenId));
+  
+    //let isSuccess = transactionContractDao.buy(tokenId,sellResource.transactionAddress,userAccount,sellResource.ownerAccount);
+    if(transactionHash == undefined){
       logger.warn("enter buy",{
         user:user,
         tokenId:tokenId,
@@ -237,8 +237,9 @@ exports.rent = async function(req, res, next) {
       return;
     }
     //2.调用交易合约的购买方法，合约里转移所有权
-    let isSuccess = transactionContractDao.rent(tokenId,rentResource.transactionAddress,userAccount,rentResource.ownerAccount);
-    if(!isSuccess){
+    let transactionHash =  transactionContractDao.lease(userAccount,rentResource.rentPrice,rentResourceDoc[0].resourceAddress,parseInt(tokenId));
+    //let isSuccess = transactionContractDao.rent(tokenId,rentResource.transactionAddress,userAccount,rentResource.ownerAccount);
+    if(transactionHash == undefined){
       logger.warn("enter rent",{
         user:user,
         tokenId:tokenId,

@@ -81,7 +81,9 @@ contract BookCopyrightCreate is AccessControl{           //目前的合约编写
             timestamp: timestamp_now
         });
 
-        uint256 newBookCopyrightId = bookCopyrights.push(_bookCopyRight) - 1;
+
+        //uint256 newBookCopyrightId = bookCopyrights.length - 1;
+        uint256 newBookCopyrightId  = bookCopyrights.push(_bookCopyRight)-1;
         emit _RegisterCopyright(_bookName, _authorName, _authorAddress, newBookCopyrightId, timestamp_now);
 
         if(fees != 0) {                              //记录版权所需要消耗的费用

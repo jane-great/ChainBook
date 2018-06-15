@@ -146,6 +146,11 @@ const CopyrightContractDao = class dao {
       }
     });
   }
+  
+  //返回版权合约得地址
+  getCopyrightContractAddress(){
+    return dao.bookCopyrightAddress;
+  }
 }
 
 module.exports = new CopyrightContractDao();

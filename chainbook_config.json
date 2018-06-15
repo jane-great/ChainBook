@@ -18,9 +18,14 @@
   "server":{
     "domain":"",
     "bookCopyrightCreate_source":"./smartcontracts/contracts/BookCopyrightCreate.sol",
+    "bookOwnerShip_source":"./smartcontracts/contracts/BookOwnerShip.sol",
+    "transaction_source":"./smartcontracts/contracts/Transaction.sol",
+    "buyAndSell_source":"./smartcontracts/contracts/BuyAndSell.sol",
+    "rentAndLease_source":"./smartcontracts/contracts/RentAndLease.sol",
     "contract_path":"./smartcontracts/contracts/",
     "address":"0x192Aa6873a4B8DAf59Fd0aDe090878d250d1dAeD",
-    "userAccount":"0xbf74c9f57341fc80447323cd1d623705d12394fe",
+    "userAccount":"0x7cF2baAe306B1B0476843De3909097be0E6850f3",
+    "bookOwnership_limit":2,
     "gas":1500000
   },
   "ipfs":{

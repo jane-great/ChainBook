@@ -2,6 +2,7 @@ const log4js = require("log4js");
 const logger = log4js.getLogger("controller/user");
 const encrypt = require('../utils/encrypt');
 const thunder = require("../utils/thunder");
+const resourceContract = require("../dao/resourceContract");
 const transactionContract = require("../dao/transactionContract");
 const userDao = require("../dao/user");
 const resourceInfoDao = require("../dao/resourceInfo");
@@ -198,8 +199,10 @@ exports.sell = async function(req, res, next) {
     }
     
     let resourceInfo = await resourceInfoDao.findById(resourceId);
-    //2、先判断拿到tokenId和合约地址,是否属于当前用个人账户，并且判断是否属于二手交易的首次交易，如果是则创建交易合约，如果不是就获取交易合约地址合约，将交易合约处于挂起状态，让资源处于售卖状态
-    let transactionAddressTmp = transactionContract.sell(resourceInfo.resourceAddress,tokenId,sellResource.transactionAddress);
+    //2.1先判断拿到tokenId和合约地址,是否属于当前用个人账户，并且判断是否属于二手交易的首次交易，如果是则创建交易合约，如果不是就获取交易合约地址合约，将交易合约处于挂起状态，让资源处于售卖状态
+    resourceContract.approve(resourceInfo.resourceAddress,user.account,transactionContract.address(),tokenId);
+    //2.2 交易hash
+    let transactionAddressTmp = transactionContract.sell(user.account,resourceInfo.resourceAddress,tokenId,sellPrice);
     //3、合约创建部署成功触发事件，更新登记交易合约的地址，还有售卖状态至1
     let transactionAddress = transactionAddressTmp == null?sellResource.transactionAddress:transactionAddressTmp;
     var sellResourceObj = {
@@ -271,7 +274,10 @@ exports.rentOut = async function(req, res, next) {
   
       let resourceInfo = await resourceInfoDao.findById(resourceId);
       //2、先判断拿到tokenId和合约地址,是否属于当前用个人账户，并且判断是否属于二手交易的首次交易，如果是则创建交易合约，如果不是就获取交易合约地址合约，将交易合约处于挂起状态，让资源处于售卖状态
-      let transactionAddressTmp = transactionContract.rentOut(resourceInfo.resourceAddress,tokenId,rentOutResource.transactionAddress);
+      resourceContract.approve(resourceInfo.resourceAddress,user.account,transactionContract.address(),tokenId);
+      let transactionAddressTmp = transactionContract.rent(user.account,resourceInfo.resourceAddress,tokenId,rentPrice,rentTime);
+  
+      //let transactionAddressTmp = transactionContract.rentOut(resourceInfo.resourceAddress,tokenId,rentOutResource.transactionAddress);
   
       let transactionAddress = transactionAddressTmp == null?rentOutResource.transactionAddress:transactionAddressTmp;
       //3、合约创建部署成功触发事件，更新登记交易合约的地址，还有售卖状态至1
