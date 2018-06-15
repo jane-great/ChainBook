@@ -92,14 +92,14 @@ app.use(express.static(path.join(__dirname, '../dist')));
 // 路由的配置需要放置在前面,且使用根目录路由
 app.use('/', mainRouter);
 
-/*app.get('*', function (req, res, next) {
+app.get("/" + config.appName+'/*', function (req, res, next) {
   if(req.originalUrl.indexOf('/user') ==0 && req.originalUrl.indexOf('/copyright') == 0 && req.originalUrl.indexOf('/resource') ==0) {
     const html = fs.readFileSync(resolve('../dist/index.html'), 'utf-8');
     res.send(html);
   }else{
     next();
   }
-});*/
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

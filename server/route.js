@@ -24,6 +24,7 @@ router.post(URL+"/user/localLogin",passport.authenticate('local',{
 
 router.post(URL+"/user/localLogout",auth.isAuthenticated,user.logout);
 router.get(URL+"/user/renderUser",auth.isAuthenticated, user.getCurrentUserInfo);
+router.get(URL+"/user/getUserInfoByAccount",auth.isAuthenticated, user.getUserInfoByAccount);
 
 //用户个人管理
 router.get(URL+"/user/getCopyRightsByUser",auth.isAuthenticated,user.getCopyRightsByUser);

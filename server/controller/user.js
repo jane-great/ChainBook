@@ -94,6 +94,23 @@ exports.getCurrentUserInfo = function(req, res, next) {
   res.send({ "success": true, "data": user });
 };
 
+exports.getUserInfoByAccount = async function(req,res,next){
+  let account = req.param("account");
+  
+  if(account == undefined || account == "" || account == null){
+    res.send({status:0,msg:"account 必传"});
+    return;
+  }
+  try{
+    let userInfo = await userDao.findUserInfoByAccount(account);
+    res.send({status:1,msg:"success",data:userInfo});
+  }catch (e) {
+    logger.error("getUserInfoByAccount fail",{account:account},e);
+    res.send({status:0,msg:"getUserInfoByAccount fail"});
+  }
+  
+}
+
 /**
  * 获取当前用户已购买的资源列表
  * @param req

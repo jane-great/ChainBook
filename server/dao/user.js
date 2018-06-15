@@ -52,6 +52,23 @@ UserDao.prototype.verifyUser = function (userName, password) {
   });
 }
 
+UserDao.prototype.findUserInfoByAccount = function(account){
+  return new Promise((resolve, reject) => {
+    User.findOne({ account: account }, {
+      userName: 1,
+      //email:1,
+      //mobile:1,
+      account: 1
+    }, function(err, obj) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(obj);
+      }
+    });
+  });
+}
+
 UserDao.prototype.findUserInfoById = function(id){
   return new Promise((resolve, reject) => {
     User.findOne({_id: id},{
@@ -424,7 +441,7 @@ UserDao.prototype.modifyRentStatusAndTransactionAddress = function(id,tokenId,re
  * @param sellStatus 0:不售卖，1：售卖，2：已售卖
  * @returns {*}
  */
-UserDao.prototype.modifyCopyrightInfo = function(id,copyrightId,resourceAddress){
+UserDao.prototype.modifyCopyrightInfo = function(id,copyrightId,resourceAddress,resourceId){
   try{
     ObjectUtil.notNullAssert(id);
     ObjectUtil.notNullAssert(copyrightId);
@@ -432,7 +449,7 @@ UserDao.prototype.modifyCopyrightInfo = function(id,copyrightId,resourceAddress)
     
     return new Promise((resolve,reject) => {
       User.update({'_id':id,'copyrights.copyrightId':copyrightId},
-        {$set:{ 'copyrights.$.resourceAddress': resourceAddress }},function(err,updateObj){
+        {$set:{ 'copyrights.$.resourceAddress': resourceAddress,'copyrights.$.resourceId': resourceId }},function(err,updateObj){
           if(err){
             reject(err);
           }else{
@@ -500,6 +517,7 @@ UserDao.prototype.buildEmptyCopyright = function(){
     resourcesIpfsDHash:"",
     localUrl:"",
     copyrightAddress:"",
+    copyrightId:"",
     resourceAddress:"",
   }
 }

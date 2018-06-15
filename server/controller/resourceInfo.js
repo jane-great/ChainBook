@@ -48,16 +48,17 @@ exports.publishResource = async function(req, res, next) {
       coverImage:coverImage,
       price:price,
       copyrightAddress:copyright.copyrightAddress,
+      copyrightId:copyright._id,
       authorAccount:authorAccount,
-      hasSellOut:0,
+      hasSellOut:-1, //默认为：-1 可能合约部署有异常
     }
     let saveObj = await resourceInfoDao.add(resourceInfo);
-    //3、创建资源合约 TODO 待对接
+    //3、创建资源合约
     let resourceAddress = await resourceContractDao.publishResource(user,resourceInfo);
     //4、登记发行状态、合约地址 ,4在3的后面
     await resourceInfoDao.modifyResourceAddress(saveObj._id.toString(),resourceAddress);
-    await resourceCopyrightDao.modifyPublishStatus(copyrightId,PUBLISHED,resourceAddress);
-    await userDao.modifyCopyrightInfo(user._id,copyrightId,resourceAddress);
+    await resourceCopyrightDao.modifyPublishStatus(copyrightId,PUBLISHED,resourceAddress,saveObj._id);
+    await userDao.modifyCopyrightInfo(user._id,copyrightId,resourceAddress,saveObj._id);
     //5、返回结果
     res.send({status:1,msg:"发行成功"});
   }catch (e) {

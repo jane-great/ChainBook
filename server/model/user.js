@@ -15,6 +15,7 @@ var userSchema = new mongoose.Schema({
     localUrl:String,
     copyrightAddress:String,
     resourceAddress:String,
+    resourceId:String,
   })],
   purchasedResources:[new mongoose.Schema({
     _id: false,

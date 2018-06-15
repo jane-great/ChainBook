@@ -242,7 +242,7 @@ ResourceInfoDao.prototype.modifyResourceAddress = function(id,resourceAddress){
     
     return new Promise((resolve,reject) => {
       ResourceInfo.update({'_id':id},
-        {$set:{ 'resourceAddress': resourceAddress }},function(err,updateObj){
+        {$set:{ 'resourceAddress': resourceAddress,'hasSellOut': 0}},function(err,updateObj){
           if(err){
             reject(err);
           }else{

@@ -122,7 +122,9 @@ let registerCopyright = async function(userObj,copyrightId){
     let resourceHash = await ipfsResourcesDao.upload(copyrightObj.localUrl,userObj);
     let resourceDHash = encrypt.getMD5(resourceHash,"");
     //3、调用合约的登记版权的方法，登记合约,保存版权的信息和版权的hash值，并返回合约地址
-    let copyrightAddress = await copyrightContractDao.registerCopyright(userObj,copyrightObj);
+    copyrightObj.resourceHash = resourceHash;
+    copyrightObj.resourceDHash = resourceDHash;
+      let copyrightAddress = await copyrightContractDao.registerCopyright(userObj,copyrightObj);
     //4、登记hash，dhash,合约地址，审核状态等至resourceCopyright和user中
     await resourceCopyrightDao.updateResourceCopyrightInfo(copyrightObj._id,copyrightAddress,resourceHash,resourceDHash,1);
     //5、登记到用户的版权信息下

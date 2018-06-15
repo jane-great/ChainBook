@@ -41,7 +41,7 @@ contract BookCopyrightCreate is AccessControl{           //目前的合约编写
 
     bookCopyRight[] private bookCopyrights;
 
-    event _RegisterCopyright(string _bookName, string authorName, address _authorAddress, string _copyrightAddress, uint256 _timestamp);
+    event _RegisterCopyright(string _bookName, string authorName, address _authorAddress, uint256 _newBookCopyrightId, uint256 _timestamp);
 
     function setFees(uint256 _fees) external onlyCEO{   // 设置版权登记费用
         fees = _fees;
@@ -82,7 +82,7 @@ contract BookCopyrightCreate is AccessControl{           //目前的合约编写
         });
 
         uint256 newBookCopyrightId = bookCopyrights.push(_bookCopyRight) - 1;
-        emit _RegisterCopyright(bookName, authorName, authorAddress, ipfsHash, timestamp_now);
+        emit _RegisterCopyright(_bookName, _authorName, _authorAddress, newBookCopyrightId, timestamp_now);
 
         if(fees != 0) {                              //记录版权所需要消耗的费用
             ceoAddress.transfer(fees);

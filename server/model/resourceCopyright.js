@@ -3,6 +3,7 @@ var ResourceCopyrightSchema = new mongoose.Schema({
   workName:String,
   workCategory:String,
   copyrightAddress:String,
+  resourceId:String,
   resourceAddress:String,
   resourceHash:String,
   resourceDHash:String,

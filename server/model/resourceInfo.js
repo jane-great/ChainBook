@@ -5,6 +5,7 @@ var resourceInfoSchema = new mongoose.Schema({
   total:Number,
   coverImage:String,
   price:String,
+  copyrightId:String,
   copyrightAddress:String,
   resourceAddress: String,
   authorAccount:String,
