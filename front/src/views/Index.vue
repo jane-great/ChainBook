@@ -11,7 +11,6 @@
         <el-card class="box-card" shadow="never">
           <div slot="header" class="clearfix">
             <span class="sub-header">二手市场</span>
-            <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
           </div>
           <div v-for="item in secondHandList" :key="item._id" class="text item">
             {{ item.resourceName }}
@@ -22,7 +21,6 @@
         <el-card class="box-card" shadow="never">
           <div slot="header" class="clearfix">
             <span class="sub-header">租赁市场</span>
-            <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
           </div>
           <div v-for="item in rentList" :key="item._id" class="text item">
             {{ item.resourceName }}
@@ -39,7 +37,7 @@ export default {
       firstResourceList: [],
       secondHandList: [],
       rentList: []
-    }
+    };
   },
   mounted() {
     const query = {
@@ -60,7 +58,7 @@ export default {
   methods: {
 
   }
-}
+};
 </script>
 
 <style lang="scss">
@@ -85,11 +83,5 @@ export default {
   .sub-header {
     font-weight: bold;
   }
-}
-.el-carousel__item:nth-child(2n) {
-  // background-color: #99a9bf;
-}
-.el-carousel__item:nth-child(2n+1) {
-  // background-color: #d3dce6;
 }
 </style>
