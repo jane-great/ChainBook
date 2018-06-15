@@ -92,7 +92,7 @@ export default function (request) {
       }).then(({ data }) => data);
     },
     // 购买二手资源
-    buy(tokenId, resourceId) {
+    buy({ tokenId, resourceId }) {
       return request({
         url: '/resource/buy',
         method: 'post',
@@ -103,7 +103,7 @@ export default function (request) {
       }).then(({ data }) => data);
     },
     // 租赁
-    rent(tokenId, resourceId) {
+    rent({ tokenId, resourceId }) {
       return request({
         url: '/resource/rent',
         method: 'post',
