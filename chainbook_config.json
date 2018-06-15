@@ -20,6 +20,7 @@
     "bookCopyrightCreate_source":"./smartcontracts/contracts/BookCopyrightCreate.sol",
     "contract_path":"./smartcontracts/contracts/",
     "address":"0x192Aa6873a4B8DAf59Fd0aDe090878d250d1dAeD",
+    "userAccount":"0xbf74c9f57341fc80447323cd1d623705d12394fe",
     "gas":1500000
   },
   "ipfs":{

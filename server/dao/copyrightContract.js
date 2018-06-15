@@ -122,9 +122,12 @@ const CopyrightContractDao = class dao {
             reject(e);
           }else{
             if(transactionId === result.transactionHash){
-              logger.info("_RegisterCopyright event",result);
+              logger.info("_RegisterCopyright event",{
+                result:result,
+                _newBookCopyrightId:result.args._newBookCopyrightId.toString()
+              });
               registerCopyrightEvent.stopWatching();
-              resolve(result.args._newBookCopyrightId);
+              resolve(result.args._newBookCopyrightId.toString());
             }
           }
         });

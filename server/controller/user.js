@@ -5,6 +5,7 @@ const thunder = require("../utils/thunder");
 const transactionContract = require("../dao/transactionContract");
 const userDao = require("../dao/user");
 const resourceInfoDao = require("../dao/resourceInfo");
+const config = require("../config");
 
 //预出售的状态
 const preSellStatus = 1;
@@ -66,7 +67,7 @@ exports.register = async function(req, res, next) {
     email:req.body.email,
     mobile:req.body.mobile,
     randomNum:random,
-    account:"0x7cF2baAe306B1B0476843De3909097be0E6850f3"
+    account:config.server.userAccount
   }
   
   //TODO 校验注册的基本内容
