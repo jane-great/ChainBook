@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.21;
 
 import "./AccessControl.sol";
 import "./BuyAndSell.sol";
